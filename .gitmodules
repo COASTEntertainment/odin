@@ -1,0 +1,3 @@
+[submodule "aether"]
+	path = source/aether
+	url = https://github.com/cullvox/aether.git
