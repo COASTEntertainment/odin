@@ -2,7 +2,7 @@
 #define __ODIN_MESH_H__
 
 
-#include "Aether/aether.h"
+#include <aether/aether.h>
 
 
 /* This is the standard vertex in odin */

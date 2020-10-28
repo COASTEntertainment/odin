@@ -2,11 +2,20 @@
 
 #include "assert.h"
 
-#include "Aero/a_memory.h"
-
 #include "o_vulkan_platform.h"
-#include "o_vulkan_image.h"
 
+
+/* Creates a validation debug messenger */
+VkResult odin_vulkan_create_debug_utils_messenger
+(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* debugMessengerCreateInfo, const VkAllocationCallbacks* allocationCallbacks, VkDebugUtilsMessengerEXT* pMessenger);
+
+/* Destroys a validation debug messenger */
+void odin_vulkan_destroy_debug_utils_messenger
+(VkInstance instance, VkDebugUtilsMessengerEXT messenger, const VkAllocationCallbacks* pAllocator);
+
+/* Debug callback for validation layers */
+VKAPI_ATTR VkBool32 VKAPI_CALL odin_vulkan_validation_callback
+(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
 extern void odin_vulkan_get_api_capabilities                                    
 (odin_api_capabilities* capabilities)
@@ -15,7 +24,7 @@ extern void odin_vulkan_get_api_capabilities
 }
 
 extern void odin_vulkan_init                                                    
-(odin_data** data)
+(odin_data** data, odin_initalization_information* initalization_info)
 {
 
     /* Allocate the data pointer */
@@ -38,7 +47,7 @@ extern void odin_vulkan_init
     application_info.pNext = NULL;
     application_info.pApplicationName = g_applicationName;
     application_info.applicationVersion = (uint32_t)VK_MAKE_VERSION(g_applicationVersion.major, g_applicationVersion.minor, g_applicationVersion.patch);
-    application_info.pEngineName = "Aero";
+    application_info.pEngineName = "Odin";
     application_info.engineVersion = (uint32_t)VK_MAKE_VERSION(g_applicationVersion.major, g_applicationVersion.minor, g_applicationVersion.patch);
     application_info.apiVersion = VK_API_VERSION_1_2;
 

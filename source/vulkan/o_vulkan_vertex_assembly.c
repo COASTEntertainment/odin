@@ -1,12 +1,8 @@
 #include "o_vulkan_vertex_assembly.h"
 
-#include "Aero/a_memory.h"
-
-#include "Aether/aether.h"
-
 
 odin_vertex_assembly* odin_vulkan_vertex_assembly_create
-(odin_data* data, aero_size_t vertex_size)
+(odin_data* data, uint32_t vertex_size)
 {
     /* Check and make sure that odin_vulkan_vertex_assemblys is initalized */
     if(odin_vulkan_vertex_assemblys.count == 0)

@@ -2,6 +2,8 @@
 #define __ODIN_PIPELINE_H__
 
 
+#include "stdint.h"
+
 #include "o_uniform_buffer.h"
 #include "o_image_2d.h"
 
@@ -16,7 +18,7 @@ typedef struct odin_shader_fragment odin_shader_fragment;
 typedef struct odin_pipeline_descriptor_information
 {
     int uniforms_count;
-    odin_buffer_uniform** uniforms;
+    odin_uniform_buffer** uniforms;
     int image_count;
     odin_image_2d** images;
 } odin_pipeline_descriptor_information;
@@ -27,15 +29,15 @@ typedef struct odin_pipeline odin_pipeline;
 
 /* Loads a shader file */
 void* (* odin_shader_load)
-(const char* path, aero_size_t* codeSize);
+(const char* path, uint32_t* code_size);
 
 /* Creates a vertex shader */
 odin_shader_vertex* (* odin_shader_vertex_create)
-(odin_data* data, void* code, aero_size_t codeSize);
+(odin_data* data, void* code, uint32_t code_size);
 
 /* Creates a fragment shader */
 odin_shader_fragment* (* odin_shader_fragment_create)
-(odin_data* data, void* code, aero_size_t codeSize);
+(odin_data* data, void* code, uint32_t code_size);
 
 /* Creates a pipeline */
 odin_pipeline* (* odin_pipeline_create)

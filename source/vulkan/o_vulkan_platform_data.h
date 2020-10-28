@@ -5,20 +5,20 @@
 #include <vulkan/vulkan.h>
 
 
-typedef struct odin_vulkan_buffer_frame odin_vulkan_buffer_frame;
-
-
 typedef struct odin_vulkan_platform_data
 {
     
-    VkSurfaceKHR surface;
-    VkSwapchainKHR swapchain;
-    VkSurfaceFormatKHR format;
-    VkExtent2D extent;
+    VkSurfaceKHR            surface;
+    VkSwapchainKHR          swapchain;
+    VkSurfaceFormatKHR      format;
+    VkPresentModeKHR        present_mode;
+    VkExtent2D              extent;
 
-    uint32_t swapchain_images_count;
-    VkImage *swapchain_images;
-    odin_vulkan_buffer_frame *swapchain_frame_buffers;
+    uint32_t                image_count;
+    VkImage                 *swapchain_images;
+    VkFramebuffer           *framebuffers;
+
+    bool                    swapchain_out_of_date;
 
 } odin_vulkan_platform_data;
 

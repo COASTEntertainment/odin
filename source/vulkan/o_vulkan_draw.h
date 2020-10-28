@@ -7,11 +7,11 @@
 
 /* When all required render objects are created we can prepare for rendering */
 extern void odin_vulkan_draw_prepare
-(odin_data* data); 
+(odin_data *data); 
 
 /* Changes how rendering happens */
 extern void odin_vulkan_draw_set_function
-(odin_data* data, void(* odin_draw_func)(odin_data* data, odin_buffer_command* commandBuffer));
+(odin_data *data, odin_draw_func draw_func);
 
 /* Sets the clear color */
 extern void odin_vulkan_draw_set_clear_color_vec4f        
@@ -19,19 +19,15 @@ extern void odin_vulkan_draw_set_clear_color_vec4f
 
 /* Binds a pipeline for rendering */
 extern void odin_vulkan_draw_set_pipeline
-(odin_data* data, odin_buffer_command* commandBuffer, odin_pipeline* pipeline);
+(odin_data* data, odin_draw_data *draw_data, odin_pipeline* pipeline);
 
 /* Specifies which vertex buffer to use this draw */
-extern void odin_vulkan_draw_set_buffer_vertex            
-(odin_data* data, odin_buffer_command* commandBuffer, odin_buffer_vertex* vertexBuffer); 
+extern void odin_vulkan_draw_set_vertex_buffer           
+(odin_data* data, odin_draw_data *draw_data, odin_vertex_buffer *vertex_buffer); 
 
 /* Specifies which index buffer to use this draw */
-extern void odin_vulkan_draw_set_buffer_index             
-(odin_data* data, odin_buffer_command* commandBuffer, odin_buffer_index* indexBuffer); 
-
-/*
-extern void odin_vulkan_render_upload_uniform               
-(odin_data* data, odin_buffer_command commandBuffer, odin_pipeline* pipelineInstance, odin_buffer_uniform* uniform, void* value); /* Upload a uniform to a pipeline instance */
+extern void odin_vulkan_draw_set_index_buffer             
+(odin_data* data, odin_draw_data *draw_data, odin_index_buffer *index_buffer); 
 
 /*
 extern void odin_vulkan_render_set_buffer_instance_data     
@@ -43,7 +39,7 @@ extern void odin_vulkan_render_set_texture
 
 /* Submits the frame to drawing on the gpu */
 extern void odin_vulkan_draw_indexed                      
-(odin_data* data, odin_buffer_command* commandBuffer, uint32_t indexCount); 
+(odin_data* data, odin_draw_data *draw_data, uint32_t index_count); 
 
 /* When rendering is to stop */
 extern void odin_vulkan_draw_done                         

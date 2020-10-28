@@ -25,7 +25,7 @@ typedef struct odin_model
 
 
 odin_model* odin_model_load
-(aero_path path, odin_vertex_type vertex_type);
+(const char* path, odin_vertex_type vertex_type);
 
 
 #endif /* __ODIN_MODEL_H__ */

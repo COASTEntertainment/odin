@@ -7,7 +7,7 @@
 
 
 /* Creates a uniform buffer object */
-odin_buffer_uniform* odin_vulkan_uniform_create
+odin_buffer_uniform* odin_vulkan_uniform_buffer_create
 (odin_data* data, odin_buffer_uniform_stage_type stage, aero_size_t buffer_size)
 {
     /* Get the vulkan data */
@@ -96,7 +96,7 @@ odin_buffer_uniform* odin_vulkan_uniform_create
 }
 
 /* Destroys a uniform buffer */
-void odin_vulkan_uniform_destroy
+void odin_vulkan_uniform_buffer_destroy
 (odin_data* data, odin_buffer_uniform* uniform)
 {
     /* Get the vulkan data */
@@ -110,7 +110,7 @@ void odin_vulkan_uniform_destroy
 }
 
 /* Changes the data in the uniform */
-void odin_vulkan_uniform_update
+void odin_vulkan_uniform_buffer_update
 (odin_data* data, odin_buffer_uniform* uniform, void* buffer_data)
 {
     /* Get the vulkan data */

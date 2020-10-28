@@ -3,7 +3,7 @@
 add_subdirectory(aether)
 
 # Define a list that has no values
-set(OdinSources "")
+set(odin_sources "")
 
 # Add all the basic odin source files
 list(APPEND OdinSources
@@ -35,31 +35,31 @@ find_package(Vulkan REQUIRED)
 
 if(Vulkan_FOUND)
 
-    list(APPEND OdinSources
+    list(APPEND odin_sources
                 
     )
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
-        list(APPEND OdinSources
+        list(APPEND odin_sources
             "vulkan/platforms/o_vulkan_platform_windows.c"
         )
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     
-        list(APPEND OdinSources
+        list(APPEND odin_sources
             "vulkan/platforms/o_vulkan_platform_linux.c"
         )
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
-        list(APPEND OdinSources
+        list(APPEND odin_sources
             "o_vulkan_platform_darwin.c"
         )
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
 
-    list(APPEND OdinSources
+    list(APPEND odin_sources
         "o_vulkan_platform_android.c"
     )
 
@@ -70,23 +70,25 @@ endif()
 
 
 # Create Library
-add_library(Odin STATIC ${OdinSources})
+add_library(odin STATIC ${OdinSources})
 
-target_link_libraries(Odin freetype)
+# Link the mathematics library
+if(odin_use_default_mathematics_library)
+    target_link_libraries(odin STATIC aether)
+endif()
 
 
 # Odin Definitions
-
 if(Vulkan_FOUND)
     
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
-        target_compile_definitions(Odin PUBLIC ODIN_VULKAN VK_USE_PLATFORM_WIN32_KHR)
+        target_compile_definitions(odin PUBLIC ODIN_VULKAN VK_USE_PLATFORM_WIN32_KHR)
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
-        target_compile_definitions(Odin PUBLIC ODIN_VULKAN VK_USE_PLATFORM_XLIB_KHR)
+        target_compile_definitions(odin PUBLIC ODIN_VULKAN VK_USE_PLATFORM_XLIB_KHR)
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
@@ -94,20 +96,18 @@ if(Vulkan_FOUND)
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
 
-
-
-endif()
+    endif()
 
 endif()
 
 
-target_include_directories(Odin PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(Odin ${Vulkan_LIBRARIES})
+target_include_directories(odin PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(odin ${Vulkan_LIBRARIES})
 
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     # For extra window options
-    target_link_libraries(Odin dwmapi.dll)
+    target_link_libraries(odin dwmapi.dll)
 
 endif()

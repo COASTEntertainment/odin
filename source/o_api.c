@@ -1,9 +1,9 @@
 #include "odin.h"
 
-#include "Aero/log.h"
+#include "odin_config.h"
+
 
 /* Include all APIS */
-
 #ifdef ODIN_VULKAN
     #include "vulkan/o_vulkan.h"
 
@@ -29,7 +29,7 @@ void odin_load_api(odin_api api)
 
 
         default:
-            LOG_ERROR("Specified rendering API was invalid!");
+            ODIN_ERROR("o_api.c", __LINE__, 0x0001, "Specified rendering API was invalid!");
         break;
 
     }
@@ -41,7 +41,7 @@ void odin_load_api(odin_api api)
     void odin_load_api_vulkan()
     {
 
-        odin_get_api_capabilities = odin_vulkan_get_api_capabilities;
+        odin_api_get_capabilities = odin_vulkan_get_api_capabilities;
         odin_init = odin_vulkan_init;
         odin_free = odin_vulkan_free;
 
@@ -53,15 +53,15 @@ void odin_load_api(odin_api api)
         odin_vertex_assembly_destroy            = odin_vulkan_vertex_assembly_destroy;
         odin_vertex_assembly_add_element        = odin_vulkan_vertex_assembly_add_element;
 
-        odin_buffer_vertex_create               = odin_vulkan_buffer_vertex_create;
-        odin_buffer_vertex_destroy              = odin_vulkan_buffer_vertex_destroy;
+        odin_vertex_buffer_create               = odin_vulkan_vertex_buffer_create;
+        odin_vertex_buffer_destroy              = odin_vulkan_vertex_buffer_destroy;
 
-        odin_buffer_index_create                = odin_vulkan_buffer_index_create;
-        odin_buffer_index_destroy               = odin_vulkan_buffer_index_destroy;
+        odin_index_buffer_create                = odin_vulkan_index_buffer_create;
+        odin_index_buffer_destroy               = odin_vulkan_index_buffer_destroy;
 
-        odin_buffer_uniform_create              = odin_vulkan_uniform_create;
-        odin_buffer_uniform_destroy             = odin_vulkan_uniform_destroy;
-        odin_buffer_uniform_update              = odin_vulkan_uniform_update;
+        odin_uniform_buffer_create              = odin_vulkan_uniform_buffer_create;
+        odin_uniform_buffer_destroy             = odin_vulkan_uniform_buffer_destroy;
+        odin_uniform_buffer_update              = odin_vulkan_uniform_buffer_update;
 
         odin_shader_load                        = odin_vulkan_shader_load;
         odin_shader_vertex_create               = odin_vulkan_shader_vertex_create;
@@ -72,8 +72,8 @@ void odin_load_api(odin_api api)
         odin_draw_set_function                  = odin_vulkan_draw_set_function;
         odin_draw_prepare                       = odin_vulkan_draw_prepare;
         odin_draw_done                          = odin_vulkan_draw_done;
-        odin_draw_set_buffer_vertex             = odin_vulkan_draw_set_buffer_vertex;
-        odin_draw_set_buffer_index              = odin_vulkan_draw_set_buffer_index;
+        odin_draw_set_vertex_buffer             = odin_vulkan_draw_set_vertex_buffer;
+        odin_draw_set_index_buffer              = odin_vulkan_draw_set_index_buffer;
         odin_draw_set_pipeline                  = odin_vulkan_draw_set_pipeline;
         odin_draw_indexed                       = odin_vulkan_draw_indexed;
 

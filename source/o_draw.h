@@ -3,13 +3,13 @@
 
 
 #include "o_data.h"
-#include "o_command_buffer.h"
+#include "o_draw_data.h"
 #include "o_vertex_buffer.h"
 #include "o_index_buffer.h"
 #include "o_pipeline.h"
 
 
-typedef void (* odin_draw_func)(odin_data *render, odin_buffer_command *command_buffer);
+typedef void ( *odin_draw_func)(odin_data *render, odin_draw_data *draw_data);
 
 
 /* When all required render objects are created we can prepare for rendering */
@@ -25,20 +25,20 @@ void ( *odin_draw_set_clear_color_vec4f)
 (odin_data *data, float *color);
 
 /* Specifies which vertex buffer to use this draw */
-void ( *odin_draw_set_buffer_vertex)
-(odin_data *data, odin_buffer_command *command_buffer, odin_buffer_vertex *vertex_buffer); 
+void ( *odin_draw_set_vertex_buffer)
+(odin_data *data, odin_draw_data *draw_data, odin_vertex_buffer *vertex_buffer); 
 
 /* Specifies which index buffer to use this draw */
-void ( *odin_draw_set_buffer_index)
-(odin_data *data, odin_buffer_command *command_buffer, odin_buffer_index *index_buffer); 
+void ( *odin_draw_set_index_buffer)
+(odin_data *data, odin_draw_data *draw_data, odin_index_buffer *index_buffer); 
 
 /* Binds a pipeline for rendering */
 void ( *odin_draw_set_pipeline)
-(odin_data *data, odin_buffer_command *command_buffer, odin_pipeline *pipeline);
+(odin_data *data, odin_draw_data *draw_data, odin_pipeline *pipeline);
 
 /* Submits the commants to drawing the set objects to the gpu */
 void ( *odin_draw_indexed)
-(odin_data *data, odin_buffer_command *command_buffer, uint32_t index_count); 
+(odin_data *data, odin_draw_data *draw_data, uint32_t index_count); 
 
 /* When rendering is to stop */
 void ( *odin_draw_done)

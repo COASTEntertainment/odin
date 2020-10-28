@@ -1,8 +1,14 @@
 #ifndef __ODIN_INTERNAL_H__
 #define __ODIN_INTERNAL_H__
 
+#include <stdio.h>
 
-#include <aether/aether.h>
+#include "aether/aether.h"
+
+
+/* Error handling functions */
+#define ODIN_ERROR(filename, line, id, description) printf("%s (%d): %d, %s", filename, line, id, description);
+
 
 /* Define the math functions and types */
 /* If you need to change these definitions for your project you should */

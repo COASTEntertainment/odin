@@ -2,6 +2,9 @@
 #define __ODIN_API_H__
 
 
+#include <stdbool.h>
+
+
 /* Allows for choosing a specific API to load */
 typedef enum odin_api
 {
