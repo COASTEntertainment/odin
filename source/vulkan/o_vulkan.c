@@ -20,7 +20,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL odin_vulkan_validation_callback
 extern void odin_vulkan_get_api_capabilities                                    
 (odin_api_capabilities* capabilities)
 {
-    capabilities->physicalDevices = true;
+    capabilities->physical_devices = true;
 }
 
 extern void odin_vulkan_init                                                    
@@ -28,8 +28,8 @@ extern void odin_vulkan_init
 {
 
     /* Allocate the data pointer */
-    odin_vulkan_data* vulkan_data = (odin_vulkan_data*)aero_malloc(sizeof(odin_vulkan_data));
-    aero_memset(*data, sizeof(odin_vulkan_data), 0);
+    odin_vulkan_data* vulkan_data = malloc(sizeof(odin_vulkan_data));
+    memset(*data, sizeof(odin_vulkan_data), 0);
 
     /* Set the data pointer */
     *data = (odin_data*)vulkan_data;
@@ -45,10 +45,10 @@ extern void odin_vulkan_init
     VkApplicationInfo application_info = { 0 };
     application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     application_info.pNext = NULL;
-    application_info.pApplicationName = g_applicationName;
-    application_info.applicationVersion = (uint32_t)VK_MAKE_VERSION(g_applicationVersion.major, g_applicationVersion.minor, g_applicationVersion.patch);
-    application_info.pEngineName = "Odin";
-    application_info.engineVersion = (uint32_t)VK_MAKE_VERSION(g_applicationVersion.major, g_applicationVersion.minor, g_applicationVersion.patch);
+    application_info.pApplicationName = initalization_info->application_name;
+    application_info.applicationVersion = (uint32_t)VK_MAKE_VERSION(initalization_info->application_version_major, initalization_info->application_version_minor, initalization_info->application_version_patch);
+    application_info.pEngineName = initalization_info->engine_name;
+    application_info.engineVersion = (uint32_t)VK_MAKE_VERSION(initalization_info->engine_version_major, initalization_info->engine_version_minor, initalization_info->engine_version_patch);
     application_info.apiVersion = VK_API_VERSION_1_2;
 
     /* Get platform validation layers */
@@ -81,10 +81,10 @@ extern void odin_vulkan_init
     instance_create_info.ppEnabledExtensionNames = instance_extensions;
 
     /* Create the vulkan application instance */
-    VK_CHECK(vkCreateInstance(&instance_create_info, NULL, &vulkan_data->instance), "Could not create Vulkan instance!");
+    VK_CHECK(vkCreateInstance(&instance_create_info, NULL, &vulkan_data->instance), "o_vulkan.c", 0x1001, "Vulkan: Could not create instance!");
 
     /* Create the vulkan debug messenger */
-    VK_CHECK(odin_vulkan_create_debug_utils_messenger(vulkan_data->instance, &debug_messenger_create_info, NULL, &vulkan_data->debug_utils_messenger), "Could not create the debug messenger");
+    VK_CHECK(odin_vulkan_create_debug_utils_messenger(vulkan_data->instance, &debug_messenger_create_info, NULL, &vulkan_data->debug_utils_messenger), "o_vulkan.c", 0x1002, "Vulkan: Could not create debug messenger!");
 
     /* Init platform */
     odin_vulkan_platform_init((odin_data*)vulkan_data);
@@ -116,12 +116,12 @@ VKAPI_ATTR VkBool32 VKAPI_CALL odin_vulkan_specific_validation_callback
     {
 
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-            LOG_INFO("%s", pCallbackData->pMessage);
+            ODIN_ERROR("o_vulkan.c", __LINE__, 0x1003, pCallbackData->pMessage);
         break;
 
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-            LOG_ERROR("%s", pCallbackData->pMessage);
+            ODIN_ERROR("o_vulkan.c", __LINE__, 0x1003, pCallbackData->pMessage);
         break;
 
     };

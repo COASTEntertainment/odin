@@ -1,10 +1,8 @@
 #include "o_vulkan_physical_device.h"
 
-#include "Aero/a_string.h"
-#include "Aero/a_memory.h"
-
 #include "o_vulkan.h"
 #include "o_vulkan_platform.h"
+
 #include "vma.h"
 
 
@@ -20,15 +18,15 @@ void odin_vulkan_get_physical_devices
     vkEnumeratePhysicalDevices(vulkan_data->instance, &physical_device_count, NULL);
 
     /* Get all of the physical devices */
-    VkPhysicalDevice* temp_physical_devices = (VkPhysicalDevice*)aero_malloc(sizeof(VkPhysicalDevice) * physical_device_count);
+    VkPhysicalDevice* temp_physical_devices = malloc(sizeof(VkPhysicalDevice) * physical_device_count);
     vkEnumeratePhysicalDevices(vulkan_data->instance, &physical_device_count, temp_physical_devices);
 
     /* Set the physical device count */
     *devices_count = physical_device_count;
 
     /* Create the physical device array */
-    odin_vulkan_physical_device* vulkan_physical_devices = (odin_vulkan_physical_device*)aero_malloc(sizeof(odin_vulkan_physical_device) * physical_device_count);
-    aero_memset(vulkan_physical_devices, sizeof(odin_vulkan_physical_device) * physical_device_count, 0);
+    odin_vulkan_physical_device* vulkan_physical_devices = malloc(sizeof(odin_vulkan_physical_device) * physical_device_count);
+    memset(vulkan_physical_devices, sizeof(odin_vulkan_physical_device) * physical_device_count, 0);
 
     /* Add physical devices to array */
     for(uint32_t i = 0; i < physical_device_count; i++)
@@ -37,7 +35,7 @@ void odin_vulkan_get_physical_devices
     }
 
     /* Cleanup the temp_physical_devices */
-    aero_free(temp_physical_devices);
+    free(temp_physical_devices);
 
     /* Return with the new array */
     *physical_devices = (odin_physical_device*)vulkan_physical_devices;
@@ -55,8 +53,8 @@ void odin_vulkan_physical_device_get_information
     vkGetPhysicalDeviceProperties(vulkan_physical_device->physical_device, &properties);
 
     /* Set information */
-    aero_memset(physical_device_info->name, VK_MAX_PHYSICAL_DEVICE_NAME_SIZE, '\0');
-    aero_strcpy(physical_device_info->name, VK_MAX_PHYSICAL_DEVICE_NAME_SIZE, properties.deviceName);
+    memset(physical_device_info->name, VK_MAX_PHYSICAL_DEVICE_NAME_SIZE, '\0');
+    strcpy(physical_device_info->name, VK_MAX_PHYSICAL_DEVICE_NAME_SIZE, properties.deviceName);
 }
 
 #define QUEUE_COUNT 2

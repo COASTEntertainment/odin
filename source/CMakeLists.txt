@@ -11,7 +11,9 @@ list(APPEND OdinSources
     "o_api.h"
     "o_api.c"
     "o_data.h"
+
     "o_physical_device.h"
+
     "o_platform.h"
     "o_platform_data.h"
 
@@ -20,11 +22,11 @@ list(APPEND OdinSources
     "o_vertex_buffer.h"
     "o_index_buffer.h"
     "o_uniform_buffer.h"
-    "o_command_buffer.h"
 
     "o_pipeline.h"
 
     "o_draw.h"
+    "o_draw_data.h"
 )
 
 
@@ -36,7 +38,32 @@ find_package(Vulkan REQUIRED)
 if(Vulkan_FOUND)
 
     list(APPEND odin_sources
-                
+        "vulkan/o_vulkan.h"  
+        "vulkan/o_vulkan.c"
+        "vulkan/o_vulkan_data.h"
+
+        "vulkan/o_vulkan_physical_device.h"
+        "vulkan/o_vulkan_physical_device.c"
+
+        "vulkan/o_vulkan_platform.h"
+        "vulkan/o_vulkan_platform_data.h"
+
+        "vulkan/o_vulkan_vertex_assembly.h"
+        "vulkan/o_vulkan_vertex_assembly.c"
+
+        "vulkan/o_vulkan_vertex_buffer.h"
+        "vulkan/o_vulkan_vertex_buffer.c"
+        "vulkan/o_vulkan_index_buffer.h"
+        "vulkan/o_vulkan_index_buffer.c"
+        "vulkan/o_vulkan_uniform_buffer.h"
+        "vulkan/o_vulkan_uniform_buffer.c"
+
+        "vulkan/o_vulkan_pipeline.h"
+        "vulkan/o_vulkan_pipeline.c"
+
+        "vulkan/o_vulkan_draw.h"
+        "vulkan/o_vulkan_draw.c"
+        "vulkan/o_vulkan_draw_data.h"
     )
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -70,7 +97,7 @@ endif()
 
 
 # Create Library
-add_library(odin STATIC ${OdinSources})
+add_library(odin STATIC ${odin_sources})
 
 # Link the mathematics library
 if(odin_use_default_mathematics_library)
@@ -110,4 +137,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # For extra window options
     target_link_libraries(odin dwmapi.dll)
 
+endif()
+
+
+
+# Build examples
+if(odin_enable_examples)
+    add_subdirectory(examples)
 endif()

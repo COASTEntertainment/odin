@@ -4,15 +4,16 @@
 
 #include "stdint.h"
 
+#include "o_handle.h"
 #include "o_data.h"
 #include "o_vertex_assembly.h"
 
 
 /* A buffer with vertices */
-typedef struct odin_vertex_buffer odin_vertex_buffer; 
+ODIN_DEFINE_HANDLE(odin_vertex_buffer) 
 
 /* A dynamic buffer with vertices */
-typedef struct odin_vertex_buffer_dynamic odin_vertex_buffer_dynamic; 
+ODIN_DEFINE_HANDLE(odin_vertex_buffer_dynamic) 
 
 
 /* Creates a buffer on the gpu with the specified vertices */

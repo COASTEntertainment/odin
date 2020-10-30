@@ -4,14 +4,15 @@
 
 #include "stdint.h"
 
+#include "o_handle.h"
 #include "o_data.h"
 
 
 /* A buffer with vertex indices */
-typedef struct odin_index_buffer odin_index_buffer;
+ODIN_DEFINE_HANDLE(odin_index_buffer);
 
 /* A dynamic buffer with vertex indices */
-typedef struct odin_index_buffer_dynamic odin_index_buffer_dynamic;
+ODIN_DEFINE_HANDLE(odin_index_buffer_dynamic);
 
 
 /* Creates a buffer on the GPU with vertex indices */

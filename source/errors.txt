@@ -1,1 +1,7 @@
 0x0001, Specified API was invalid!
+
+
+
+0x1001, Vulkan: Could not create instance!
+0x1002, Vulkan: Could not create debug messenger!
+0x1003, Vulkan: {Validation Message}

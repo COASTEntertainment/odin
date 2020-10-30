@@ -2,6 +2,7 @@
 #define __ODIN_IMAGE_2D_H__
 
 
+#include "o_handle.h"
 #include "o_data.h"
 
 
@@ -13,7 +14,7 @@ typedef enum odin_image_2d_tiling
 } odin_image_2d_tiling;
 
 /* A two dimensional image that can be used as a texture */
-typedef struct odin_image_2d odin_image_2d;
+ODIN_DEFINE_HANDLE(odin_image_2d);
 
 
 /* Creates an image with data */ 

@@ -2,11 +2,12 @@
 #define __ODIN_PHYSICAL_DEVICE_H__
 
 
+#include "o_handle.h"
 #include "o_data.h"
 
 
 /* A representation of a systems actual GPU. These are unique ids and should be same with every run */
-typedef struct odin_physical_device odin_physical_device;
+ODIN_DEFINE_HANDLE(odin_physical_device);
 
 /* Information about a GPU that is likely to be used */
 typedef struct odin_physical_device_information

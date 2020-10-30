@@ -4,15 +4,19 @@
 
 #include "stdint.h"
 
+#include "o_handle.h"
 #include "o_uniform_buffer.h"
 #include "o_image_2d.h"
 
 
 /* A vertex shader that determines how vertices should act */
-typedef struct odin_shader_vertex odin_shader_vertex;
+ODIN_DEFINE_HANDLE(odin_shader_vertex);
 
 /* A fragment shader that determines what pixels should look like */
-typedef struct odin_shader_fragment odin_shader_fragment;
+ODIN_DEFINE_HANDLE(odin_shader_fragment);
+
+/* A pipeline that binds shader programs */
+ODIN_DEFINE_HANDLE(odin_pipeline);
 
 /* Descriptor information that tells the engine what resources a pipeline needs before hand */
 typedef struct odin_pipeline_descriptor_information
@@ -23,8 +27,6 @@ typedef struct odin_pipeline_descriptor_information
     odin_image_2d** images;
 } odin_pipeline_descriptor_information;
 
-/* A pipeline that binds shader programs */
-typedef struct odin_pipeline odin_pipeline;
 
 
 /* Loads a shader file */

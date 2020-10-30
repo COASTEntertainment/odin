@@ -3,6 +3,7 @@
 
 
 #include "../odin.h"
+#include "../odin_config.h"
 #include "../o_api.h"
 
 #include "vulkan/vulkan.h"
@@ -13,7 +14,7 @@
 #include "o_vulkan_vertex_assembly.h"
 #include "o_vulkan_vertex_buffer.h"
 #include "o_vulkan_index_buffer.h"
-#include "o_vulkan_buffer_uniform.h"
+#include "o_vulkan_uniform_buffer.h"
 #include "o_vulkan_image_2d.h"
 #include "o_vulkan_pipeline.h"
 #include "o_vulkan_draw.h"
@@ -32,8 +33,8 @@ extern void odin_vulkan_free
 
 
 
-#define VK_CHECK(con, message)       \
-    if(con != VK_SUCCESS) LOG_ERROR(message);
+#define VK_CHECK(con, filename, id, message)       \
+    if(con != VK_SUCCESS) ODIN_ERROR(filename, __LINE__, id, message);
 
 
 #endif /* __ENGINE_ODIN_VULKAN_INTERNAL_H__ */

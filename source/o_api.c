@@ -3,7 +3,7 @@
 #include "odin_config.h"
 
 
-/* Include all APIS */
+/* Include all APIs */
 #ifdef ODIN_VULKAN
     #include "vulkan/o_vulkan.h"
 
