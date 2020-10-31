@@ -2,7 +2,7 @@
 #define __ODIN_VULKAN_INITIALIZE__
 
 
-#include "odin/o_data.h"
+#include "odin/o_initialize.h"
 
 
 /** \brief Initializes Vulkan API calls and creates the data variable. */

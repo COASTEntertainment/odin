@@ -15,7 +15,7 @@ set(odin_sources "")
 
 # Build the sources list
 list(APPEND odin_sources 
-    
+    "source/o_api.c"
 )
 
 # Find Third Party libraries
