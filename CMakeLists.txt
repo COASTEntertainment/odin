@@ -26,7 +26,21 @@ list(APPEND odin_sources
     if(Vulkan_FOUND)
 
         # Add Vulkan API Sources
-        
+        list(APPEND odin_sources
+            "source/apis/vulkan/o_vulkan_api.c"
+            "source/apis/vulkan/o_vulkan_initialize.c"
+        )
+
+        # Add vulkan platform specific sources
+        if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+
+            list(APPEND odin_sources
+                "source/apis/vulkan/platforms/o_vulkan_platform_windows.c"
+            )
+
+        elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+        endif()
 
     endif()
 
@@ -49,7 +63,12 @@ add_library(odin STATIC ${odin_sources})
         target_compile_definitions(odin PUBLIC ODIN_HAS_VULKAN)
     endif()
 
-
-
-
 target_include_directories(odin PUBLIC include)
+
+
+# Build Examples
+if(odin_enable_examples)
+
+    add_subdirectory(examples)
+
+endif()

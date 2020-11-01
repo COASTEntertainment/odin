@@ -2,7 +2,8 @@
 #define __ODIN_H__
 
 
-#include "o_data.h"
+#include "o_api.h"
+#include "o_render_device.h"
 #include "o_initialize.h"
 
 

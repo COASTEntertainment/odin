@@ -6,10 +6,10 @@
 
 
 /** \brief Initializes the odin_data structure and creates any Render API calls that are required. */
-void (* odin_initialize)(odin_render_device* data);
+void (* odin_initialize)(odin_render_device* render_device);
 
 /** \brief Stops all Render API resources and frees any required memory. */
-void (* odin_terminate)(odin_render_device data);
+void (* odin_terminate)(odin_render_device render_device);
 
 
 #endif /* __ODIN_INITIALIZE_H__ */

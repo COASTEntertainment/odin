@@ -7,6 +7,7 @@
 void odin_vulkan_api_load()
 {
 
-    odin_initialize = 
+    odin_initialize = odin_vulkan_initialize;
+    odin_terminate = odin_vulkan_terminate;
 
 }

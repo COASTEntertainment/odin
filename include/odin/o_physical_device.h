@@ -2,6 +2,9 @@
 #define __ODIN_PHYSICAL_DEVICE__
 
 
+#include "odin/o_render_device.h"
+
+
 /** \brief A handle to data that stores information about a graphics card */
 typedef struct odin_physical_device_t* odin_physical_device;
 
