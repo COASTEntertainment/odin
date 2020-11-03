@@ -1,3 +1,6 @@
 [submodule "aether"]
 	path = source/aether
 	url = https://github.com/cullvox/aether.git
+[submodule "source/aero"]
+	path = source/aero
+	url = https://github.com/COASTEntertainment/aero
