@@ -36,6 +36,7 @@ list(APPEND odin_sources
 
             list(APPEND odin_sources
                 "source/apis/vulkan/platforms/o_vulkan_platform_windows.c"
+                "source/apis/vulkan/o_vulkan_window_windows.c"
             )
 
         elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

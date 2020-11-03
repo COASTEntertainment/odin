@@ -5,8 +5,26 @@
 #include "o_render_device.h"
 
 
+typedef struct odin_version
+{
+
+    int major, minor, patch;
+
+} odin_version;
+
+typedef struct odin_initialize_info
+{
+
+    const char* application_name; /** \brief The name of the application/main window. */
+    odin_version application_version; /** \brief The version of the application */
+    const char* engine_name; /** \brief The name of the engine. */
+    odin_version engine_version; /** \brief The version of the engine. */
+
+} odin_initialize_info;
+
+
 /** \brief Initializes the odin_data structure and creates any Render API calls that are required. */
-void (* odin_initialize)(odin_render_device* render_device);
+void (* odin_initialize)(odin_render_device* render_device, odin_initialize_info* initialize_info);
 
 /** \brief Stops all Render API resources and frees any required memory. */
 void (* odin_terminate)(odin_render_device render_device);
