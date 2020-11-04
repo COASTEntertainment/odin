@@ -21,14 +21,22 @@ int main()
     int monitors_count = 0;
     odin_get_monitors(render_device, &monitors_count, NULL);
 
-    odin_monitor_t* monitors = malloc(sizeof(odin_monitor_t) * monitors_count);
-    memset(monitors, 0, sizeof(odin_monitor_t) * monitors_count);
+    odin_monitor* monitors = malloc(sizeof(odin_monitor) * monitors_count);
+    memset(monitors, 0, sizeof(odin_monitor) * monitors_count);
 
     odin_get_monitors(render_device, &monitors_count, monitors);
 
-    int width = monitors[0].width;
-    int height = monitors[0].height;
+    int width = monitors[0]->width;
+    int height = monitors[0]->height;
 
+    odin_window window = NULL;
+    odin_window_create(render_device, &window, "Cube Example", 0, 0, monitors[0]->width / 2, monitors[0]->height / 2, odin_window_style_minimal, false, NULL);
+
+    free(monitors);
+
+
+
+    odin_window_destroy(render_device, window);
 
     odin_terminate(render_device);
 }

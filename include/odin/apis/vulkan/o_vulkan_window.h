@@ -7,7 +7,7 @@
 
 
 /** \brief Gets a systems monitors and their information. */
-void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor_t *monitors);
+void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor *monitors);
 
 /** \brief Creates a window for rendering to. */
 void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);

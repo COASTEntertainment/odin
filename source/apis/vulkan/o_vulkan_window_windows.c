@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 
+#include "aero/a_memory.h"
+
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 
 
@@ -15,10 +17,12 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
     if(temp_monitors_iterator > temp_monitors_count)
         temp_monitors_count = 0;
     
-    odin_monitor_t* monitors = (odin_monitor_t *)dwData;
+    odin_monitor* monitors = (odin_monitor *)dwData;
 
-    monitors[temp_monitors_iterator].width = lprcMonitor->right - lprcMonitor->left;
-    monitors[temp_monitors_iterator].height = lprcMonitor->bottom - lprcMonitor->top;
+    monitors[temp_monitors_iterator] = malloc(sizeof(odin_monitor_t));
+
+    monitors[temp_monitors_iterator]->width = lprcMonitor->right - lprcMonitor->left;
+    monitors[temp_monitors_iterator]->height = lprcMonitor->bottom - lprcMonitor->top;
 
     temp_monitors_iterator++;
 
@@ -26,7 +30,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
 }
 
 /** \brief Gets a systems monitors and their information. */
-void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor_t *monitors)
+void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor *monitors)
 {
 
     /* First we need to get the display count. */
@@ -36,10 +40,15 @@ void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_co
     if(monitors == NULL)
         return;
 
-    if(monitors)
-        EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)monitors);
-        
+    EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)monitors);        
 }
+
+typedef struct odin_windows_window_t
+{
+
+    HWND handle;
+
+} odin_windows_window_t;
 
 void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor)
 {
@@ -65,14 +74,39 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         break;
     }
 
-    CreateWindow("ODIN_VULKAN_WINDOW_CLASS", vulkan_render_device->initialize_info.application_name, window_style, x, y, width, height, 0, NULL, GetModuleHandle(NULL), NULL);
+    /* Create the windows window. */
+    odin_windows_window_t* vulkan_window = malloc(sizeof(odin_windows_window_t));
+    aero_memset(vulkan_window, sizeof(odin_windows_window_t), 0);
 
-    
+    *window = (odin_window)vulkan_window;
+
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    HWND handle = CreateWindowEx(
+        0,                              // Optional window styles.
+        "ODIN_VULKAN_WINDOW_CLASS",                     // Window class
+        title,    // Window text
+        WS_OVERLAPPEDWINDOW,            // Window style
+
+        // Size and position
+        x, y, width, height,
+
+        NULL,       // Parent window    
+        NULL,       // Menu
+        hInstance,  // Instance handle
+        NULL        // Additional application data
+        );
+
+    ShowWindow(handle, 0);
 
 }
 
 void odin_vulkan_window_destroy(odin_render_device render_device, odin_window window)
 {
-    
+
+    /* Get the vulkan window. */
+    odin_windows_window_t* vulkan_window = (odin_windows_window_t*)window;
+
+    DestroyWindow(vulkan_window->handle);
+
 }
 

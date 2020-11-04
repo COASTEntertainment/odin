@@ -58,9 +58,9 @@ void odin_vulkan_platform_initialize(odin_vulkan_render_device render_device)
 {
 
     /* Create the windows window class */
-    WNDCLASS window_class = { 0 };
+    WNDCLASSEX window_class = { 0 };
     window_class.style              = 0;
-    window_class.lpfnWndProc        = NULL; /* Window procedure must be defined by an input layer! */
+    window_class.lpfnWndProc        = DefWindowProc; /* Window procedure must be defined by an input layer! */
     window_class.cbClsExtra         = 0;
     window_class.cbWndExtra         = 0;
     window_class.hInstance          = GetModuleHandle(NULL);
@@ -70,7 +70,7 @@ void odin_vulkan_platform_initialize(odin_vulkan_render_device render_device)
     window_class.lpszMenuName       = NULL;
     window_class.lpszClassName      = "ODIN_VULKAN_WINDOW_CLASS";
 
-    RegisterClass(&window_class);
+    RegisterClassEx(&window_class);
 
 }
 

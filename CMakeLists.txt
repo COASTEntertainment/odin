@@ -45,10 +45,15 @@ list(APPEND odin_sources
 
     endif()
 
+# Add COAST Entertainment required libraries
+add_subdirectory("source/aero")
 
 
 add_library(odin STATIC ${odin_sources})
 
+
+# Link COAST Entertainment libraries
+target_link_libraries(odin aero)
 
 # Link, include, and define Third Party libraries
 

@@ -4,6 +4,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "aero/a_memory.h"
+
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_platform.h"
 
@@ -15,9 +17,8 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
     *render_device = malloc(sizeof(odin_vulkan_render_device_t));
 
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)*render_device;
-
     
-
+    aero_memcpy(&vulkan_render_device->initialize_info, sizeof(odin_initialize_info), initialize_info, sizeof(odin_initialize_info));
 
     VkApplicationInfo application_info = { 0 };
     application_info.sType                  = VK_STRUCTURE_TYPE_APPLICATION_INFO;
