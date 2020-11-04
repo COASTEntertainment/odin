@@ -59,18 +59,22 @@ void odin_vulkan_platform_initialize(odin_vulkan_render_device render_device)
 
     /* Create the windows window class */
     WNDCLASSEX window_class = { 0 };
-    window_class.style              = 0;
-    window_class.lpfnWndProc        = DefWindowProc; /* Window procedure must be defined by an input layer! */
-    window_class.cbClsExtra         = 0;
-    window_class.cbWndExtra         = 0;
-    window_class.hInstance          = GetModuleHandle(NULL);
-    window_class.hIcon              = NULL;
-    window_class.hCursor            = NULL;
-    window_class.hbrBackground      = NULL;
-    window_class.lpszMenuName       = NULL;
-    window_class.lpszClassName      = "ODIN_VULKAN_WINDOW_CLASS";
+    window_class.cbSize = sizeof( WNDCLASSEX );
+	window_class.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	window_class.lpfnWndProc = DefWindowProc;
+	window_class.cbClsExtra = 0;
+	window_class.cbWndExtra = 0;
+	window_class.hInstance = GetModuleHandle(NULL);
+	window_class.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+	window_class.hCursor = (HCURSOR)LoadCursor( NULL, IDC_ARROW );
+	window_class.hbrBackground = (HBRUSH)GetStockObject( WHITE_BRUSH );
+	window_class.lpszMenuName = NULL;
+	window_class.lpszClassName = "ODIN_VULKAN_WINDOW_CLASS";
+	window_class.hIconSm = NULL;
 
     RegisterClassEx(&window_class);
+
+        int problem = GetLastError();
 
 }
 

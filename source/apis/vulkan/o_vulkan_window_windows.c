@@ -62,11 +62,11 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
     switch (style)
     {
     case odin_window_style_defalt:
-        window_style = WS_OVERLAPPEDWINDOW;
+        window_style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
         break;
     
     case odin_window_style_minimal:
-        window_style = WS_BORDER;
+        window_style = WS_BORDER | WS_VISIBLE;
         break;
 
     default:
@@ -88,7 +88,7 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         WS_OVERLAPPEDWINDOW,            // Window style
 
         // Size and position
-        x, y, width, height,
+        CW_USEDEFAULT, CW_USEDEFAULT, width, height,
 
         NULL,       // Parent window    
         NULL,       // Menu
@@ -96,7 +96,9 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         NULL        // Additional application data
         );
 
-    ShowWindow(handle, 0);
+    int problem = GetLastError();
+
+    ShowWindow(handle, SW_SHOW);
 
 }
 
