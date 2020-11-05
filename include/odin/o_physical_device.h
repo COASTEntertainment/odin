@@ -3,6 +3,7 @@
 
 
 #include "odin/o_render_device.h"
+#include "odin/o_window.h"
 
 
 /** \brief A handle to data that stores information about a graphics card */

@@ -3,7 +3,20 @@
 
 
 #include "odin/o_window.h"
+
+#include <vulkan/vulkan.h>
+
 #include "odin/o_render_device.h"
+
+
+/** \brief A base vulkan abstraction for a window/drawing surface. */
+typedef struct odin_vulkan_window_t
+{
+
+    VkSurfaceKHR surface; /** \brief The drawing surface. */
+    VkSwapchainKHR swapchain; /** \brief The swapchain */
+
+} *odin_vulkan_window;
 
 
 /** \brief Gets a systems monitors and their information. */
@@ -17,6 +30,13 @@ void odin_vulkan_window_destroy(odin_render_device render_device, odin_window wi
 
 /** \brief Changes the windows to be fullscreen or not. */
 void odin_vulkan_window_fullscreen(odin_render_device render_device, odin_window window, bool fullscreen);
+
+
+/** \brief Creates a swapchain for a window. */
+void odin_vulkan_window_swapchain_create(odin_vulkan_window window);
+
+/** \brief Destroys a swapchain for a window. */
+void odin_vulkan_window_swapchain_destroy(odin_vulkan_window window);
 
 
 #endif /* __ODIN_VULKAN_WINDOW_H__ */

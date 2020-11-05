@@ -124,3 +124,19 @@ void odin_vulkan_window_destroy(odin_render_device render_device, odin_window wi
 
 }
 
+
+void odin_vulkan_window_swapchain_create(odin_vulkan_window window)
+{
+
+    VkSwapchainCreateInfoKHR swapchain_create_info = { 0 };
+    swapchain_create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    //swapchain_create_info
+
+    //vkCreateSwapchainKHR();
+
+}
+
+void odin_vulkan_window_swapchain_destroy(odin_vulkan_window window)
+{
+
+}

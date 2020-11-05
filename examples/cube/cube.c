@@ -48,7 +48,8 @@ int main()
     odin_get_physical_devices(render_device, &physical_devices_count, physical_devices);
 
 
-    odin_set_physical_device(render_device, physical_devices[0]);
+    odin_set_physical_device(render_device, physical_devices[0], window);
+    
 
 
     odin_window_destroy(render_device, window);
