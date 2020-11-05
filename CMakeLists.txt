@@ -29,6 +29,7 @@ list(APPEND odin_sources
         list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_api.c"
             "source/apis/vulkan/o_vulkan_initialize.c"
+            "source/apis/vulkan/o_vulkan_physical_device.c"
         )
 
         # Add vulkan platform specific sources

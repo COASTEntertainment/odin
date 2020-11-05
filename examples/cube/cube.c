@@ -37,12 +37,18 @@ int main()
 
     free(monitors);
 
+    
+    /* Get the physical devices. */
+    int physical_devices_count = 0;
+    odin_get_physical_devices(render_device, &physical_devices_count, NULL);
 
-    int x = 2;
-    while(x <= 3030300300)
-    {
-        x++;
-    }
+    odin_physical_device* physical_devices = malloc(sizeof(odin_physical_device) * physical_devices_count);
+    memset(physical_devices, 0, sizeof(odin_physical_device) * physical_devices_count);
+
+    odin_get_physical_devices(render_device, &physical_devices_count, physical_devices);
+
+
+    odin_set_physical_device(render_device, physical_devices[0]);
 
 
     odin_window_destroy(render_device, window);

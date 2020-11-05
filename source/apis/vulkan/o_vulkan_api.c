@@ -14,4 +14,8 @@ void odin_vulkan_api_load()
     odin_window_create = odin_vulkan_window_create;
     odin_window_destroy = odin_vulkan_window_destroy;
 
+    odin_get_physical_devices = odin_vulkan_get_physical_devices;
+    odin_get_physical_device_properties = odin_vulkan_get_physical_device_properties;
+    odin_set_physical_device = odin_vulkan_set_physical_device;
+
 }

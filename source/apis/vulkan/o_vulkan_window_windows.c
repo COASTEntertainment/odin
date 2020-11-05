@@ -66,7 +66,7 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         break;
     
     case odin_window_style_minimal:
-        window_style = WS_BORDER | WS_VISIBLE;
+        window_style = 0;
         break;
 
     default:
@@ -96,7 +96,19 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         NULL        // Additional application data
         );
 
-    int problem = GetLastError();
+
+    /* Make sure the style is correct. */
+    switch (style)
+    {
+    
+    case odin_window_style_minimal:
+        SetWindowLong(handle, GWL_STYLE, 0); //remove all window styles, check MSDN for details
+        break;
+
+    default:
+        break;
+    }
+
 
     ShowWindow(handle, SW_SHOW);
 

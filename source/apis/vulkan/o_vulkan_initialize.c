@@ -13,7 +13,7 @@
 void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_info* initialize_info)
 {
 
-    /* Create the render device */
+    /* Create the render device. */
     *render_device = malloc(sizeof(odin_vulkan_render_device_t));
 
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)*render_device;
@@ -30,16 +30,16 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
     application_info.apiVersion             = VK_API_VERSION_1_2;
 
 
-    /* Get the validation layers */
+    /* Get the validation layers. */
     uint32_t validation_layers_count = 0;
     const char **validation_layers = odin_vulkan_platform_get_validation_layers(&validation_layers_count);
 
-    /* Get the instance extensions */
+    /* Get the instance extensions. */
     uint32_t instance_extensions_count = 0;
     const char **instance_extensions = odin_vulkan_platform_get_instance_extensions(&instance_extensions_count);
 
 
-    /* Create the vulkan instance */
+    /* Create the vulkan instance. */
     VkInstanceCreateInfo instance_create_info = { 0 };
     instance_create_info.sType                      = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_create_info.pNext                      = NULL;
@@ -52,7 +52,7 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
 
     vkCreateInstance(&instance_create_info, NULL, &vulkan_render_device->instance);
 
-    /* Initialize the platform */
+    /* Initialize the platform. */
     odin_vulkan_platform_initialize(vulkan_render_device);
 
 }
@@ -60,13 +60,15 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
 void odin_vulkan_terminate(odin_render_device render_device)
 {
 
-    /* Get the vulkan render device */
+    /* Get the vulkan render device. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
-    /* Terminate the platform */
+    /* Terminate the platform. */
     odin_vulkan_platform_terminate(vulkan_render_device);
 
-    /* Destroy the vulkan instance */
+    /* Destroy the vulkan instance. */
     vkDestroyInstance(vulkan_render_device->instance, NULL);
 
+    /* Clear all render device memory. */
+    free(render_device);
 }
