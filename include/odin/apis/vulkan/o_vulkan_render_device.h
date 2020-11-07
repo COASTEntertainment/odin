@@ -6,8 +6,8 @@
 
 #include "odin/o_initialize.h"
 #include "odin/o_window.h"
-#include "odin/apis/vulkan/o_vulkan_window.h"
 
+typedef struct odin_vulkan_window_t *odin_vulkan_window;
 
 typedef struct odin_vulkan_render_device_t
 {
@@ -24,7 +24,7 @@ typedef struct odin_vulkan_render_device_t
 
     odin_vulkan_window main_window;
 
-} odin_vulkan_render_device_t, *odin_vulkan_render_device ;
+} odin_vulkan_render_device_t, *odin_vulkan_render_device;
 
 
 #endif /* __ODIN_VULKAN_DATA_H__ */

@@ -63,6 +63,11 @@ target_link_libraries(odin aero)
         # Link
         target_link_libraries(odin ${Vulkan_LIBRARIES})        
         
+        # Add vulkan platform specific links
+        if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+            target_link_libraries(odin dwmapi.dll)
+        endif()
+
         # Include
         target_include_directories(odin PUBLIC ${Vulkan_INCLUDE_DIRS})
     

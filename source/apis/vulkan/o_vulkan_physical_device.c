@@ -9,6 +9,7 @@
 #include "odin/o_log.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_platform.h"
+#include "odin/apis/vulkan/o_vulkan_window.h"
 
 
 void odin_vulkan_get_physical_devices(odin_render_device render_device, int *physical_devices_count, odin_physical_device *physical_devices)
@@ -182,6 +183,6 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
 
 
     /* Create the main windows swapchain. */
-    odin_vulkan_platform_
+    //odin_vulkan_platform_
 
 }
