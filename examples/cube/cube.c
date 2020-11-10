@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+void cube_draw(odin_render_device render_device, odin_render_data render_data);
+
+
 int main()
 {
 
@@ -52,7 +56,24 @@ int main()
     
 
 
+    /* Update the main window. */
+    while(true)
+    {
+
+        odin_draw_frame(render_device, );
+
+    }
+
+
+
     odin_window_destroy(render_device, window);
 
     odin_terminate(render_device);
 }
+
+
+void cube_draw(odin_render_device render_device, odin_render_data render_data)
+{
+
+}
+

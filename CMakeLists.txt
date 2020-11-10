@@ -70,9 +70,15 @@ target_link_libraries(odin aero)
 
         # Include
         target_include_directories(odin PUBLIC ${Vulkan_INCLUDE_DIRS})
-    
+
         # Define
         target_compile_definitions(odin PUBLIC ODIN_HAS_VULKAN)
+
+            # Add vulkan platform specific defines
+        if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+            target_compile_definitions(odin PUBLIC VK_USE_PLATFORM_WIN32_KHR)
+        endif()
+
     endif()
 
 target_include_directories(odin PUBLIC include)

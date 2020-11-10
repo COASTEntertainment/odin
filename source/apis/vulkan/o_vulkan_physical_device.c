@@ -56,9 +56,14 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     /* Get the vulkan render device. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
+    /* Get the vulkan window. */
+    odin_vulkan_window vulkan_window = (odin_vulkan_window)window;
+
     /* Set the physical device. */
     vulkan_render_device->physical_device = (VkPhysicalDevice)physical_device;
 
+    /* Set the main window. */
+    vulkan_render_device->main_window = vulkan_window;
 
 
     /* Get physical device queues */
@@ -172,7 +177,9 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
 
     /* Make sure it was created */
     if(vkCreateDevice(vulkan_render_device->physical_device, &device_create_info, NULL, &vulkan_render_device->device) != VK_SUCCESS)
+    {
         ODIN_ERROR("o_vulkan_physical_device.c", "Could not create the Vulkan logical device!");
+    }
 
     /* Get Queues */
     vkGetDeviceQueue(vulkan_render_device->device, vulkan_render_device->graphics_queue_index, 0, &vulkan_render_device->graphics_queue);
@@ -183,6 +190,7 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
 
 
     /* Create the main windows swapchain. */
-    //odin_vulkan_platform_
+    odin_vulkan_window_swapchain_create(vulkan_render_device, vulkan_window);
+    odin_vulkan_window_resources_create(vulkan_render_device, vulkan_window);
 
 }

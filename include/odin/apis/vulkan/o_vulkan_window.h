@@ -44,5 +44,11 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device
 /** \brief Destroys a swapchain for a window. */
 void odin_vulkan_window_swapchain_destroy(odin_vulkan_render_device render_device, odin_vulkan_window window);
 
+/** \brief Creates a windows resources like framebuffers and image views. */
+void odin_vulkan_window_resources_create(odin_vulkan_render_device render_device, odin_vulkan_window window);
+
+/** \brief Destroys a windows framebuffers and image views. */
+void odin_vulkan_window_resources_destroy(odin_vulkan_render_device render_device, odin_vulkan_window window);
+
 
 #endif /* __ODIN_VULKAN_WINDOW_H__ */

@@ -10,25 +10,34 @@ const char **odin_vulkan_platform_get_validation_layers(uint32_t *validation_lay
 
     static const uint32_t windows_validation_layers_count = 1;
 
-    static const char *windows_validation_layers[] = 
-    {
-        "VK_LAYER_KHRONOS_validation"
+    static const char *validation_layers[] = 
+    { 
+        "VK_LAYER_KHRONOS_validation" 
     };
 
 
     *validation_layers_count = windows_validation_layers_count;
-    return windows_validation_layers;
+    return validation_layers;
 
 }
 
 const char **odin_vulkan_platform_get_instance_extensions(uint32_t *instance_extensions_count)
 {
 
-    static const uint32_t windows_instance_extensions_count = 1;
+    static const uint32_t windows_instance_extensions_count = 
+    #if defined(NDEBUG)
+        2;
+    #else
+        3;
+    #endif
 
     static const char *windows_instance_extensions[] = 
     {
+        "VK_KHR_surface", 
         "VK_KHR_win32_surface"
+        #ifndef NDEBUG
+            , VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+        #endif  
     };
 
 
@@ -44,7 +53,7 @@ const char **odin_vulkan_platform_get_device_extensions(uint32_t *device_extensi
 
     static const char *windows_device_extensions[] = 
     {
-        "VK_LAYER_KHRONOS_validation"
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
 

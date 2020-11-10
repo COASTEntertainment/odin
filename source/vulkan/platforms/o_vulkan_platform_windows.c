@@ -125,7 +125,7 @@ const char** odin_platform_vulkan_get_instance_extensions(uint32_t* count)
         "VK_KHR_surface", 
         "VK_KHR_win32_surface"
     };
-    static const int instance_extensions_count = 2;
+    static const int  instance_extensions_count = 2;
 #endif 
 
     /* Return the static unchanging variables */
