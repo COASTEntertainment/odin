@@ -7,6 +7,7 @@
 #include "o_initialize.h"
 #include "o_window.h"
 #include "o_physical_device.h"
+#include "o_draw_data.h"
 
 
 #endif /* __ODIN_H__ */

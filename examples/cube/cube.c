@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-void cube_draw(odin_render_device render_device, odin_render_data render_data);
+void cube_draw(odin_render_device render_device, odin_draw_data render_data);
 
 
 int main()
@@ -72,7 +72,7 @@ int main()
 }
 
 
-void cube_draw(odin_render_device render_device, odin_render_data render_data)
+void cube_draw(odin_render_device render_device, odin_draw_data render_data)
 {
 
 }
