@@ -55,12 +55,15 @@ int main()
     odin_set_physical_device(render_device, physical_devices[0], window);
     
 
+    /* Create the resources. */
+    
+
 
     /* Update the main window. */
     while(true)
     {
 
-        odin_draw_frame(render_device, );
+        
 
     }
 
