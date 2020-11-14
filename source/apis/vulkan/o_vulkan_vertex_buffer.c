@@ -38,7 +38,7 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     staging_allocation_create_info.usage             = VMA_MEMORY_USAGE_CPU_ONLY;
     staging_allocation_create_info.requiredFlags     = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
     staging_allocation_create_info.preferredFlags    = 0;
-    staging_allocation_create_info.memoryTypeBits    = NULL;
+    staging_allocation_create_info.memoryTypeBits    = 0;
     staging_allocation_create_info.pool              = NULL;
     staging_allocation_create_info.pUserData         = NULL;
 
@@ -66,7 +66,7 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     allocation_create_info.usage             = VMA_MEMORY_USAGE_GPU_ONLY;
     allocation_create_info.requiredFlags     = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     allocation_create_info.preferredFlags    = 0;
-    allocation_create_info.memoryTypeBits    = NULL;
+    allocation_create_info.memoryTypeBits    = 0;
     allocation_create_info.pool              = NULL;
     allocation_create_info.pUserData         = NULL;
 

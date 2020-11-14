@@ -4165,14 +4165,12 @@ static void vma_aligned_free(void* ptr)
 #endif
 
 
-#include "Aether/aether.h"
-
 #ifndef VMA_MIN
-   #define VMA_MIN(v1, v2)    (aether_min((v1), (v2)))
+   #define VMA_MIN(left, right) (left > right) ? right : left
 #endif
 
 #ifndef VMA_MAX
-   #define VMA_MAX(v1, v2)    (aether_max((v1), (v2)))
+   #define VMA_MAX(left, right) (left > right ) ? left : right
 #endif
 
 #ifndef VMA_SWAP

@@ -7,10 +7,11 @@
 #include <aero/a_memory.h>
 
 #include "odin/o_log.h"
-#include "odin/apis/vulkan/vk_mem_alloc.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_platform.h"
 #include "odin/apis/vulkan/o_vulkan_window.h"
+
+#include "odin/apis/vulkan/vk_mem_alloc.h"
 
 
 void odin_vulkan_get_physical_devices(odin_render_device render_device, int *physical_devices_count, odin_physical_device *physical_devices)
@@ -195,10 +196,10 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     allocator_create_info.flags                             = 0;
     allocator_create_info.physicalDevice                    = (VkPhysicalDevice)physical_device;
     allocator_create_info.device                            = vulkan_render_device->device;
-    allocator_create_info.preferredLargeHeapBlockSize       = NULL;
+    allocator_create_info.preferredLargeHeapBlockSize       = 0;
     allocator_create_info.pAllocationCallbacks              = NULL;
     allocator_create_info.pDeviceMemoryCallbacks            = NULL;
-    allocator_create_info.frameInUseCount                   = NULL;
+    allocator_create_info.frameInUseCount                   = 0;
     allocator_create_info.pHeapSizeLimit                    = NULL;
     allocator_create_info.pVulkanFunctions                  = NULL;
     allocator_create_info.pRecordSettings                   = NULL;

@@ -1,6 +1,6 @@
 # Basic CMake setup
 cmake_minimum_required(VERSION 3.0.0)
-project(odin VERSION 0.1.0 LANGUAGES C)
+project(odin VERSION 0.1.0 LANGUAGES C CXX*)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
@@ -29,9 +29,9 @@ list(APPEND odin_sources
         list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_api.c"
             "source/apis/vulkan/o_vulkan_initialize.c"
+            "source/apis/vulkan/o_vulkan_vma.cpp"
             "source/apis/vulkan/o_vulkan_physical_device.c"
             "source/apis/vulkan/o_vulkan_vertex_assembly.c"
-            "source/apis/vulkan/o_vulkan_vma.cpp"
             "source/apis/vulkan/o_vulkan_vertex_buffer.c"
         )
 
