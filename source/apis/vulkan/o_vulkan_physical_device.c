@@ -209,6 +209,15 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     vmaCreateAllocator(&allocator_create_info, &vulkan_render_device->memory_allocator);
 
 
+    /* Create the command pool. */
+    VkCommandPoolCreateInfo command_pool_create_info = { 0 };
+    command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    command_pool_create_info.pNext = NULL;
+    command_pool_create_info.flags = 0;
+    command_pool_create_info.queueFamilyIndex = vulkan_render_device->graphics_queue_index;
+
+    vkCreateCommandPool(vulkan_render_device->device, &command_pool_create_info, NULL, &vulkan_render_device->command_pool);
+
     /* Create the main windows swapchain. */
     odin_vulkan_window_swapchain_create(vulkan_render_device, vulkan_window);
     odin_vulkan_window_resources_create(vulkan_render_device, vulkan_window);

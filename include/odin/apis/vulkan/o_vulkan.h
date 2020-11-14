@@ -7,6 +7,7 @@
 #include "o_vulkan_window.h"
 #include "o_vulkan_physical_device.h"
 #include "o_vulkan_vertex_assembly.h"
+#include "o_vulkan_vertex_buffer.h"
 
 
 #endif /* __ODIN_VULKAN_INITIALIZE_H__ */

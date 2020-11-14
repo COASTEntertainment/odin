@@ -33,6 +33,7 @@ list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_physical_device.c"
             "source/apis/vulkan/o_vulkan_vertex_assembly.c"
             "source/apis/vulkan/o_vulkan_vertex_buffer.c"
+            "source/apis/vulkan/o_vulkan_index_buffer.c"
         )
 
         # Add vulkan platform specific sources

@@ -85,6 +85,16 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     /* Copy the staging buffer to the vertex buffer. */
     VkCommandBuffer temporary_command_buffer = VK_NULL_HANDLE;
 
+    VkCommandBufferAllocateInfo command_buffer_allocate_info = { 0 };
+    command_buffer_allocate_info.sType                  = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    command_buffer_allocate_info.pNext                  = NULL;
+    command_buffer_allocate_info.commandPool            = vulkan_render_device->command_pool;
+    command_buffer_allocate_info.level                  = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    command_buffer_allocate_info.commandBufferCount     = 1;
+
+
+    vkAllocateCommandBuffers(vulkan_render_device->device, &command_buffer_allocate_info, &temporary_command_buffer);
+
     VkCommandBufferBeginInfo command_buffer_begin_info = { 0 };
     command_buffer_begin_info.sType     = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     command_buffer_begin_info.pNext     = NULL;
@@ -117,6 +127,8 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     {
         ODIN_ERROR("o_vulkan_vertex_buffer.c", "Could not copy a staging vertex buffer to the GPU!");
     }
+
+    vkFreeCommandBuffers(vulkan_render_device->device, vulkan_render_device->command_pool, 1, &temporary_command_buffer);
 
     /* Destroy the staging buffer. */
     vmaDestroyBuffer(vulkan_render_device->memory_allocator, staging_buffer, staging_allocation);

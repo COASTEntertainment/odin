@@ -24,6 +24,8 @@ typedef struct odin_vulkan_render_device_t
 
     VkDevice device; /** \brief The vulkan logical device for creating more objects. */
     
+    VkCommandPool command_pool; /** \brief The command pool for allocating command buffers. */
+
     VmaAllocator memory_allocator; /** \brief The allocator of Graphics memory. */
 
     odin_vulkan_window main_window;

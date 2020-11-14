@@ -4,14 +4,25 @@
 #include <string.h>
 
 
-void cube_draw(odin_render_device render_device, odin_draw_data render_data);
+void cube_draw(odin_render_device render_device, odin_draw_data draw_data);
 
 
-struct default_vertex
+typedef struct default_vertex
 {
+
     float position[3];
-    float color[4];    
+    float color[4];
+
 } default_vertex_t;
+
+
+default_vertex_t verts[4] =
+{
+    {{-0.5f, -0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f},   {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f, 0.0f},   {0.0f, 0.0f, 1.0f}},
+    {{0.5f, 0.5f, 0.0f},    {1.0f, 1.0f, 1.0f}}
+};
 
 
 int main()
@@ -70,14 +81,15 @@ int main()
     odin_vertex_assembly_describe_element(render_device, vertex_assembly, 1, odin_vertex_element_format_vec4f);
 
 
-
-
+    odin_vertex_buffer vertex_buffer;
+    odin_vertex_buffer_create(render_device, &vertex_buffer, vertex_assembly, 4, verts);
 
 
 
 
 
     /* Destroy resources. */
+    odin_vertex_buffer_destroy(render_device, vertex_buffer);
     odin_vertex_assembly_destroy(render_device, vertex_assembly);
 
 
