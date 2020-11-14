@@ -18,4 +18,8 @@ void odin_vulkan_api_load()
     odin_get_physical_device_properties = odin_vulkan_get_physical_device_properties;
     odin_set_physical_device = odin_vulkan_set_physical_device;
 
+    odin_vertex_assembly_create = odin_vulkan_vertex_assembly_create;
+    odin_vertex_assembly_destroy = odin_vulkan_vertex_assembly_destroy;
+    odin_vertex_assembly_describe_element = odin_vulkan_vertex_assembly_describe_element;
+
 }

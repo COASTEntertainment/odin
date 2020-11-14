@@ -7,6 +7,8 @@
 #include "odin/o_initialize.h"
 #include "odin/o_window.h"
 
+#include "odin/apis/vulkan/vk_mem_alloc.h"
+
 typedef struct odin_vulkan_window_t *odin_vulkan_window;
 
 typedef struct odin_vulkan_render_device_t
@@ -21,6 +23,8 @@ typedef struct odin_vulkan_render_device_t
     VkQueue present_queue; uint32_t present_queue_index; /** \brief A queue for putting images on the screen. */
 
     VkDevice device; /** \brief The vulkan logical device for creating more objects. */
+    
+    VmaAllocator memory_allocator; /** \brief The allocator of Graphics memory. */
 
     odin_vulkan_window main_window;
 

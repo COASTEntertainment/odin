@@ -7,6 +7,13 @@
 void cube_draw(odin_render_device render_device, odin_draw_data render_data);
 
 
+struct default_vertex
+{
+    float position[3];
+    float color[4];    
+} default_vertex_t;
+
+
 int main()
 {
 
@@ -55,18 +62,23 @@ int main()
     odin_set_physical_device(render_device, physical_devices[0], window);
     
 
-    /* Create the resources. */
+    /* Describe the vertex assembly to create vertex buffers. */
+    odin_vertex_assembly vertex_assembly;
+    odin_vertex_assembly_create(render_device, &vertex_assembly, 0, sizeof(default_vertex_t), 2);
     
+    odin_vertex_assembly_describe_element(render_device, vertex_assembly, 0, odin_vertex_element_format_vec3f);
+    odin_vertex_assembly_describe_element(render_device, vertex_assembly, 1, odin_vertex_element_format_vec4f);
 
 
-    /* Update the main window. */
-    while(true)
-    {
 
-        
 
-    }
 
+
+
+
+
+    /* Destroy resources. */
+    odin_vertex_assembly_destroy(render_device, vertex_assembly);
 
 
     odin_window_destroy(render_device, window);

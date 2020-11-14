@@ -7,6 +7,7 @@
 #include <aero/a_memory.h>
 
 #include "odin/o_log.h"
+#include "odin/apis/vulkan/vk_mem_alloc.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_platform.h"
 #include "odin/apis/vulkan/o_vulkan_window.h"
@@ -187,6 +188,24 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     /* vkGetDeviceQueue(g_odin_vulkan_device, g_odin_vulkan_compute_queue_family, 0, &g_odin_vulkan_compute_queue); */
 
     free(device_queue_create_infos);
+
+
+    /* Create the memory allocator. */
+    VmaAllocatorCreateInfo allocator_create_info = { 0 };
+    allocator_create_info.flags                             = 0;
+    allocator_create_info.physicalDevice                    = (VkPhysicalDevice)physical_device;
+    allocator_create_info.device                            = vulkan_render_device->device;
+    allocator_create_info.preferredLargeHeapBlockSize       = NULL;
+    allocator_create_info.pAllocationCallbacks              = NULL;
+    allocator_create_info.pDeviceMemoryCallbacks            = NULL;
+    allocator_create_info.frameInUseCount                   = NULL;
+    allocator_create_info.pHeapSizeLimit                    = NULL;
+    allocator_create_info.pVulkanFunctions                  = NULL;
+    allocator_create_info.pRecordSettings                   = NULL;
+    allocator_create_info.instance                          = vulkan_render_device->instance;
+    allocator_create_info.vulkanApiVersion                  = VK_API_VERSION_1_2;
+
+    vmaCreateAllocator(&allocator_create_info, &vulkan_render_device->memory_allocator);
 
 
     /* Create the main windows swapchain. */

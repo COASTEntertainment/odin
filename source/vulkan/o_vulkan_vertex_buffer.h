@@ -13,8 +13,10 @@
 /* A buffer with vertices */
 typedef struct odin_vulkan_vertex_buffer
 {
+
     VkBuffer buffer;
     VmaAllocation allocation;
+    
 } odin_vulkan_vertex_buffer;
 
 /* A dynamic buffer with vertices */

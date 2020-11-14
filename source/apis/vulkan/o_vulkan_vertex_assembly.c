@@ -34,6 +34,8 @@ void odin_vulkan_vertex_assembly_destroy(odin_render_device render_device, odin_
 
     free(vulkan_vertex_assembly->attributes);
     free(vulkan_vertex_assembly);
+    
+    vertex_assembly = NULL;
 
 }
 
