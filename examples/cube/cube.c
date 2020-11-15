@@ -24,6 +24,11 @@ default_vertex_t verts[4] =
     {{0.5f, 0.5f, 0.0f},    {1.0f, 1.0f, 1.0f}}
 };
 
+uint32_t indices[4] =
+{
+    0, 1, 2, 3
+};
+
 
 int main()
 {
@@ -84,12 +89,17 @@ int main()
     odin_vertex_buffer vertex_buffer;
     odin_vertex_buffer_create(render_device, &vertex_buffer, vertex_assembly, 4, verts);
 
+    odin_index_buffer index_buffer;
+    odin_index_buffer_create(render_device, &index_buffer, 4, indices);
+
 
 
 
 
     /* Destroy resources. */
+    odin_index_buffer_destroy(render_device, index_buffer);
     odin_vertex_buffer_destroy(render_device, vertex_buffer);
+
     odin_vertex_assembly_destroy(render_device, vertex_assembly);
 
 

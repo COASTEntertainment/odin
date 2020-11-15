@@ -89,7 +89,7 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     command_buffer_allocate_info.sType                  = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     command_buffer_allocate_info.pNext                  = NULL;
     command_buffer_allocate_info.commandPool            = vulkan_render_device->command_pool;
-    command_buffer_allocate_info.level                  = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    command_buffer_allocate_info.level                  = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     command_buffer_allocate_info.commandBufferCount     = 1;
 
 
@@ -104,9 +104,9 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
     vkBeginCommandBuffer(temporary_command_buffer, &command_buffer_begin_info);
 
         VkBufferCopy copy_region = { 0 };
-        copy_region.srcOffset   = staging_allocation_info.offset;
-        copy_region.dstOffset   = allocation_info.offset;
-        copy_region.size        = allocation_info.size;
+        copy_region.srcOffset   = 0;
+        copy_region.dstOffset   = 0;
+        copy_region.size        = vulkan_vertex_assembly->binding_description.stride * vertices_count;
 
         vkCmdCopyBuffer(temporary_command_buffer, staging_buffer, vulkan_vertex_buffer->buffer, 1, &copy_region);
 
@@ -128,6 +128,9 @@ void odin_vulkan_vertex_buffer_create(odin_render_device render_device, odin_ver
         ODIN_ERROR("o_vulkan_vertex_buffer.c", "Could not copy a staging vertex buffer to the GPU!");
     }
 
+    /* Wait for the queue to finish. */
+    vkQueueWaitIdle(vulkan_render_device->graphics_queue);
+
     vkFreeCommandBuffers(vulkan_render_device->device, vulkan_render_device->command_pool, 1, &temporary_command_buffer);
 
     /* Destroy the staging buffer. */
@@ -147,5 +150,8 @@ void odin_vulkan_vertex_buffer_destroy(odin_render_device render_device, odin_ve
 
     /* Destroy the buffer. */
     vmaDestroyBuffer(vulkan_render_device->memory_allocator, vulkan_vertex_buffer->buffer, vulkan_vertex_buffer->allocation);
+
+    free(vulkan_vertex_buffer);
+    vertex_buffer = NULL;
 
 }

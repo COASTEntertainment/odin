@@ -117,8 +117,16 @@ void odin_vulkan_terminate(odin_render_device render_device)
     /* Get the vulkan render device. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
+
     /* Terminate the platform. */
     odin_vulkan_platform_terminate(vulkan_render_device);
+
+
+    /* Destroy the Command Pool. */
+    vkDestroyCommandPool(vulkan_render_device->device, vulkan_render_device->command_pool, NULL);
+
+    /* Destroy the Memory Allocator. */
+    vmaDestroyAllocator(vulkan_render_device->memory_allocator);
 
     /* Destroy the device. */
     vkDestroyDevice(vulkan_render_device->device, NULL);
@@ -126,8 +134,10 @@ void odin_vulkan_terminate(odin_render_device render_device)
     /* Destroy the vulkan instance. */
     vkDestroyInstance(vulkan_render_device->instance, NULL);
 
+
     /* Clear all render device memory. */
     free(render_device);
+    render_device = NULL;
 }
 
 VkBool32 odin_vulkan_debug_utils_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)

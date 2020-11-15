@@ -25,4 +25,7 @@ void odin_vulkan_api_load()
     odin_vertex_buffer_create = odin_vulkan_vertex_buffer_create;
     odin_vertex_buffer_destroy = odin_vulkan_vertex_buffer_destroy;
 
+    odin_index_buffer_create = odin_vulkan_index_buffer_create;
+    odin_index_buffer_destroy = odin_vulkan_index_buffer_destroy;
+
 }
