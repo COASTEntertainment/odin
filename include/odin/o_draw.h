@@ -22,6 +22,6 @@ void ( *odin_draw_command_set_vertex_buffer)(odin_render_device render_device, o
 /* Sets the current index buffer to be bound. */
 void ( *odin_draw_command_set_index_buffer)(odin_render_device render_device, odin_draw_data draw_data, odin_index_buffer index_buffer);
 
-
+void ( *odin_draw_indexed)()
 
 #endif /* __ODIN_DRAW_H__ */
