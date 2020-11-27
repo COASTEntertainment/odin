@@ -3,6 +3,7 @@
 
 
 #include "o_render_device.h"
+#include "o_vertex_assembly.h"
 
 
 /** \brief A shader controls parts of the render pipeline. */
@@ -28,7 +29,7 @@ void **( *odin_pipeline_shader_load_code)(const char* path);
 void ( *odin_pipeline_shader_create)(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, void **shader_code);
 
 /** \brief Creates a pipeline from shaders.  */
-void ( *odin_pipeline_create)(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader);
+void ( *odin_pipeline_create)(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader, int vertex_assemblys_count, odin_vertex_assembly* vertex_assemblys);
 
 /** \brief Destroys a pipeline from use. */
 void ( *odin_pipeline_destroy)(odin_render_device render_device, odin_pipeline pipeline);

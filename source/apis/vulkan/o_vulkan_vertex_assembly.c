@@ -23,6 +23,8 @@ void odin_vulkan_vertex_assembly_create(odin_render_device render_device, odin_v
     vulkan_vertex_assembly->attributes = malloc(sizeof(VkVertexInputAttributeDescription) * elements_count);
     aero_memset(vulkan_vertex_assembly->attributes, sizeof(VkVertexInputAttributeDescription) * elements_count, 0);
 
+    vulkan_vertex_assembly->attributes_count = elements_count;
+
 }
 
 /** \brief Destroys a vertex assembly. */

@@ -34,7 +34,9 @@ list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_vertex_assembly.c"
             "source/apis/vulkan/o_vulkan_vertex_buffer.c"
             "source/apis/vulkan/o_vulkan_index_buffer.c"
+            "source/apis/vulkan/o_vulkan_render_pass.c"
             "source/apis/vulkan/o_vulkan_pipeline.c"
+            "source/apis/vulkan/o_vulkan_texture_2d.c"
         )
 
         # Add vulkan platform specific sources

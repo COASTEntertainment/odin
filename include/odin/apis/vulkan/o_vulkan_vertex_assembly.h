@@ -14,7 +14,8 @@ typedef struct odin_vulkan_vertex_assembly_t
 {
 
     VkVertexInputBindingDescription binding_description; /** \brief The vulkan definition of a vertex assembly size and index. */
-    VkVertexInputAttributeDescription *attributes; /** \brief The attributes in vulkan. */
+    VkVertexInputAttributeDescription *attributes; /** \brief The vertex attributes in vulkan. */
+    uint32_t attributes_count; /** \brief Indicates how many attributes are in the attributes pointer. */
 
 } odin_vulkan_vertex_assembly_t, *odin_vulkan_vertex_assembly;
 
