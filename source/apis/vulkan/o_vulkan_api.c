@@ -28,4 +28,7 @@ void odin_vulkan_api_load()
     odin_index_buffer_create = odin_vulkan_index_buffer_create;
     odin_index_buffer_destroy = odin_vulkan_index_buffer_destroy;
 
+    odin_texture_2d_create = odin_vulkan_texture_2d_create;
+    odin_texture_2d_destroy = odin_vulkan_texture_2d_destroy;
+
 }

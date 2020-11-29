@@ -9,6 +9,7 @@
 #include "o_vulkan_vertex_assembly.h"
 #include "o_vulkan_vertex_buffer.h"
 #include "o_vulkan_index_buffer.h"
+#include "o_vulkan_texture_2d.h"
 
 
 #endif /* __ODIN_VULKAN_INITIALIZE_H__ */

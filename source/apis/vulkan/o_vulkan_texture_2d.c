@@ -7,7 +7,7 @@
 #include "odin/o_render_device.h"
 #include "odin/o_texture_2d.h"
 
-#include "odin/apis/vulkan/vk_mem_alloc.h"
+#include "odin/o_log.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 
 
@@ -22,15 +22,21 @@ static VkFormat vulkan_formats[] =
     VK_FORMAT_R16_SINT,
     VK_FORMAT_R32_SINT,
 
+    VK_FORMAT_R32_SFLOAT,
+
     VK_FORMAT_R8G8_UINT,
     VK_FORMAT_R16G16_UINT,
     VK_FORMAT_R32G32_UINT,
 
     VK_FORMAT_R16G16_SFLOAT,
     VK_FORMAT_R32G32_SFLOAT,
-    
+
+    VK_FORMAT_R8G8B8_SRGB,
+
     VK_FORMAT_R16G16B16_SFLOAT,
     VK_FORMAT_R32G32B32_SFLOAT,
+
+    VK_FORMAT_R8G8B8A8_SRGB,
 
     VK_FORMAT_R16G16B16A16_SFLOAT,
     VK_FORMAT_R32G32B32A32_SFLOAT
@@ -48,7 +54,7 @@ static VkSampleCountFlags vulkan_samples[] =
     VK_SAMPLE_COUNT_64_BIT
 };
 
-void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_texture_2d* texture, odin_texture_2d_image_format format, int width, int height, int mip_levels, odin_texture_2d_samples samples, int32_t size, void *data)
+void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_texture_2d* texture, odin_image_format format, int width, int height, int mip_levels, odin_texture_2d_samples samples, int32_t size, void *data)
 {
 
     /* Get the odin vulkan render device. */
@@ -57,6 +63,28 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     /* Allocate the render device. */
     odin_vulkan_texture_2d vulkan_texture = malloc(sizeof(odin_vulkan_render_device_t));
     *texture = (odin_texture_2d)vulkan_texture;
+
+    /* Check the image create info limits. */
+    VkPhysicalDeviceProperties properties = { 0 };
+    vkGetPhysicalDeviceProperties(vulkan_render_device->physical_device, &properties);
+
+    VkImageFormatProperties image_format_properties = { 0 };
+    VkResult res = vkGetPhysicalDeviceImageFormatProperties(vulkan_render_device->physical_device, vulkan_formats[format], VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, 0, &image_format_properties);
+
+    if(width > image_format_properties.maxExtent.width || height > image_format_properties.maxExtent.height)
+    {
+        ODIN_ERROR("o_vulkan_texture_2d.c", "Image exceeds max physical device limits.");
+    }
+
+    if(mip_levels > image_format_properties.maxMipLevels)
+    {
+        ODIN_ERROR("o_vulkan_texture_2d.c", "Image exceeds max mip levels.");
+    }
+
+    if(samples > odin_texture_2d_samples_1x && mip_levels > 1)
+    {
+        ODIN_ERROR("o_vulkan_texture_2d.c", "Can not have mips with samples greater than 1x!");
+    }
 
 
     /* Create an image buffer. */
@@ -79,20 +107,27 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     allocation_create_info.pool = VK_NULL_HANDLE;
     allocation_create_info.pUserData = NULL;
 
-    VkBuffer image_buffer = VK_NULL_HANDLE;
-    VmaAllocation image_buffer_allocation = VK_NULL_HANDLE;
+    VkBuffer staging_buffer = VK_NULL_HANDLE;
+    VmaAllocation staging_buffer_allocation = VK_NULL_HANDLE;
 
     VmaAllocationInfo allocation_info = { 0 };
 
 
-    vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &image_buffer, &image_buffer_allocation, &allocation_info);
+    vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &staging_buffer, &staging_buffer_allocation, &allocation_info);
 
 
     /* Copy the image data to the buffer. */
     void* mapped_ptr;
-    vmaMapMemory(vulkan_render_device->memory_allocator, image_buffer_allocation, &mapped_ptr);
+    vmaMapMemory(vulkan_render_device->memory_allocator, staging_buffer_allocation, &mapped_ptr);
+
         aero_memcpy(mapped_ptr, size, data, size);
-    vmaUnmapMemory(vulkan_render_device->memory_allocator, image_buffer_allocation);
+
+    vmaUnmapMemory(vulkan_render_device->memory_allocator, staging_buffer_allocation);
+
+    
+
+
+
 
 
     /* Create the vulkan image. */
@@ -107,7 +142,7 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     image_create_info.arrayLayers = 1;
     image_create_info.samples = vulkan_samples[samples];
     image_create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-    image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     image_create_info.queueFamilyIndexCount = 0;
     image_create_info.pQueueFamilyIndices = NULL;
@@ -126,11 +161,12 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     image_allocation_create_info.pool = VK_NULL_HANDLE;
     image_allocation_create_info.pUserData = NULL;
 
-    VmaAllocation image_allocation;
-
     VmaAllocationInfo image_allocation_info = { 0 };
 
-    vmaAllocateMemoryForImage(vulkan_render_device->memory_allocator, vulkan_texture->image, &image_allocation_create_info, &image_allocation, &image_allocation_info);
+    vmaAllocateMemoryForImage(vulkan_render_device->memory_allocator, vulkan_texture->image, &image_allocation_create_info, &vulkan_texture->image_allocation, &image_allocation_info);
+
+    /* Bind the image memory so that it can be written to. */
+    vmaBindImageMemory(vulkan_render_device->memory_allocator, vulkan_texture->image_allocation, vulkan_texture->image);
 
 
     /* Copy the image buffer to the image. */
@@ -138,7 +174,8 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     command_buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     command_buffer_allocate_info.pNext = NULL;
     command_buffer_allocate_info.commandPool = vulkan_render_device->command_pool;
-    command_buffer_allocate_info.level = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    command_buffer_allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    command_buffer_allocate_info.commandBufferCount = 1;
 
     VkCommandBuffer temporary_command_buffer = VK_NULL_HANDLE;
 
@@ -147,10 +184,31 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     VkCommandBufferBeginInfo command_buffer_begin_info = { 0 };
     command_buffer_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     command_buffer_begin_info.pNext = NULL;
-    command_buffer_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    command_buffer_begin_info.flags = 0;
     command_buffer_begin_info.pInheritanceInfo = NULL;
 
+
     vkBeginCommandBuffer(temporary_command_buffer, &command_buffer_begin_info);
+
+        /* Transition the image layout to copy the image. */
+        VkImageMemoryBarrier barrier = { 0 };
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.pNext = NULL;
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = vulkan_texture->image;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = mip_levels;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+
+        vkCmdPipelineBarrier(temporary_command_buffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &barrier);
+
 
         VkBufferImageCopy region = { 0 };
         region.bufferOffset = 0;
@@ -158,8 +216,12 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
         region.bufferImageHeight = 0;
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = (VkOffset3D){ 0, 0, 0 };
+        region.imageExtent = (VkExtent3D){ width, height, 1 };
 
-        vkCmdCopyBufferToImage(temporary_command_buffer, image_buffer, vulkan_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        vkCmdCopyBufferToImage(temporary_command_buffer, staging_buffer, vulkan_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
         
     vkEndCommandBuffer(temporary_command_buffer);
 
@@ -176,6 +238,13 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     
     vkQueueSubmit(vulkan_render_device->graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
 
+    /* Wait for the queue to finish. */
+    vkQueueWaitIdle(vulkan_render_device->graphics_queue);
+
+    vkResetCommandBuffer(temporary_command_buffer, 0);
+
+    /* Destroy the staging buffer. */
+    vmaDestroyBuffer(vulkan_render_device->memory_allocator, staging_buffer, staging_buffer_allocation);
 
 
     /* Create the image view. */
@@ -190,23 +259,96 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     image_view_create_info.components.g = 1.0f;
     image_view_create_info.components.b = 1.0f;
     image_view_create_info.components.a = 1.0f;
-    image_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT | VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    image_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     image_view_create_info.subresourceRange.baseMipLevel = 0;
     image_view_create_info.subresourceRange.levelCount = mip_levels;
-    image_view_create_info.subresourceRange.baseArrayLayer = 1;
+    image_view_create_info.subresourceRange.baseArrayLayer = 0;
     image_view_create_info.subresourceRange.layerCount = 1;
 
     vkCreateImageView(vulkan_render_device->device, &image_view_create_info, NULL, &vulkan_texture->image_view);
 
     /* Generate the mip maps if requested. */
-    if(mip_levels < 0)
-    {
+    vkBeginCommandBuffer(temporary_command_buffer, &command_buffer_begin_info);
 
-        
+        int mip_width = width, mip_height = height;
 
-    }
+        for(int i = 1; i < mip_levels; i++)
+        {
+            
+            VkImageMemoryBarrier barrier = { 0 };
+            barrier.sType                               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.pNext                               = NULL;
+            barrier.srcAccessMask                       = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask                       = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.oldLayout                           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout                           = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.srcQueueFamilyIndex                 = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex                 = VK_QUEUE_FAMILY_IGNORED;
+            barrier.image                               = vulkan_texture->image;
+            barrier.subresourceRange.aspectMask         = VK_IMAGE_ASPECT_COLOR_BIT;
+            barrier.subresourceRange.baseMipLevel       = i - 1;
+            barrier.subresourceRange.levelCount         = 1;
+            barrier.subresourceRange.baseArrayLayer     = 0;
+            barrier.subresourceRange.layerCount         = 1;
 
+            vkCmdPipelineBarrier(temporary_command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &barrier);
+
+            /* Blit the image to get the desired mip effect. */
+            VkImageBlit blit = { 0 };
+            blit.srcSubresource.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.srcSubresource.mipLevel        = i - 1;
+            blit.srcSubresource.baseArrayLayer  = 0;
+            blit.srcSubresource.layerCount      = 1;
+            blit.srcOffsets[0]                  = (VkOffset3D){ 0, 0, 0 };
+            blit.srcOffsets[1]                  = (VkOffset3D){ mip_width, mip_height, 1 };
+            blit.dstSubresource.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.dstSubresource.mipLevel        = i;
+            blit.dstSubresource.baseArrayLayer  = 0;
+            blit.dstSubresource.layerCount      = 1;
+            blit.dstOffsets[0]                  = (VkOffset3D){ 0, 0, 0 };
+            /* If the width is greater than one, divide it by 2. That is what these ternary op's are doing. */
+            blit.dstOffsets[1]                  = (VkOffset3D){ mip_width > 1 ? mip_width / 2 : 1 , mip_height > 1 ? mip_height / 2 : 1, 1 }; 
+
+            vkCmdBlitImage(temporary_command_buffer, vulkan_texture->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vulkan_texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+
+            /* Transition the mip to a shader optimal layout. */
+            barrier.oldLayout       = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.newLayout       = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.srcAccessMask   = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.dstAccessMask   = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier(temporary_command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &barrier);
+
+            if(mip_width > 1) mip_width /= 2;
+            if(mip_height > 1) mip_height /= 2;
+
+        }
+
+    vkEndCommandBuffer(temporary_command_buffer);
+
+    vkQueueSubmit(vulkan_render_device->graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+
+    vkQueueWaitIdle(vulkan_render_device->graphics_queue);
+
+    /* Free the temporary command buffer. */
     vkFreeCommandBuffers(vulkan_render_device->device, vulkan_render_device->command_pool, 1, &temporary_command_buffer);
 
+}
+
+void odin_vulkan_texture_2d_destroy(odin_render_device render_device, odin_texture_2d texture)
+{
+
+    /* Get the odin vulkan render device. */
+    odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
+
+    /* Allocate the render device. */
+    odin_vulkan_texture_2d vulkan_texture = (odin_vulkan_texture_2d)texture;
+
+    vkDestroyImageView(vulkan_render_device->device, vulkan_texture->image_view, NULL);
+
+    vmaDestroyImage(vulkan_render_device->memory_allocator, vulkan_texture->image, vulkan_texture->image_allocation);
+
+    free(vulkan_texture);
+    vulkan_texture = NULL;
 
 }

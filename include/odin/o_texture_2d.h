@@ -2,9 +2,14 @@
 #define __ODIN_TEXTURE_2D_H__
 
 
+#include "stdint.h"
+
+#include "o_render_device.h"
+
+
 typedef struct odin_texture_2d *odin_texture_2d;
 
-typedef enum odin_texture_2d_image_format
+typedef enum odin_image_format
 {
 
     /* If you want to use specific types use these */
@@ -33,21 +38,26 @@ typedef enum odin_texture_2d_image_format
     odin_image_format_rg_16_float         = 10,
     odin_image_format_rg_32_float         = 11,
 
-    odin_image_format_rgb_16_float        = 12,
-    odin_image_format_rgb_32_float        = 13,
+    odin_image_format_rgb_8_srgb          = 12,
 
-    odin_image_format_rgba_16_float       = 14,
-    odin_image_format_rgba_32_float       = 15,
+    odin_image_format_rgb_16_float        = 13,
+    odin_image_format_rgb_32_float        = 14,
+
+    odin_image_format_rgba_8_srgb         = 15,
+
+    odin_image_format_rgba_16_float       = 16,
+    odin_image_format_rgba_32_float       = 17,
+
 
     /* Basic info enums to make it easier. */
-    odin_image_format_color               = odin_image_format_rgb_32_float,
-    odin_image_format_color_alpha         = odin_image_format_rgba_32_float,
+    odin_image_format_color               = odin_image_format_rgb_8_srgb,
+    odin_image_format_color_alpha         = odin_image_format_rgba_8_srgb,
     odin_image_format_normal              = odin_image_format_rgb_32_float,
     odin_image_format_depth               = odin_image_format_rgb_32_float,
     odin_image_format_roughness           = odin_image_format_r_32_float,
     odin_image_format_metallic            = odin_image_format_r_32_float
     
-} odin_texture_2d_image_format;
+} odin_image_format;
 
 typedef enum odin_texture_2d_samples
 {
@@ -64,9 +74,10 @@ typedef enum odin_texture_2d_samples
 
 
 /** \brief Creates a two dimensional texture that can be used for many things. */
-void ( *odin_texture_2d_create)();
+void ( *odin_texture_2d_create)(odin_render_device render_device, odin_texture_2d* texture, odin_image_format format, int width, int height, int mip_levels, odin_texture_2d_samples samples, int32_t size, void *data);
 
-void ( *odin_texture_2d_destroy)();
+/** \brief Destroys the image object and its memory. */
+void ( *odin_texture_2d_destroy)(odin_render_device render_device, odin_texture_2d texture);
 
 
 #endif /* __ODIN_TEXTURE_2D_H__ */

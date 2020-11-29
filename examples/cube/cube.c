@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 void cube_draw(odin_render_device render_device, odin_draw_data draw_data);
 
@@ -16,7 +19,7 @@ typedef struct default_vertex
 } default_vertex_t;
 
 
-default_vertex_t verts[4] =
+static default_vertex_t verts[4] =
 {
     {{-0.5f, -0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}},
     {{0.5f, -0.5f, 0.0f},   {0.0f, 1.0f, 0.0f}},
@@ -24,7 +27,7 @@ default_vertex_t verts[4] =
     {{0.5f, 0.5f, 0.0f},    {1.0f, 1.0f, 1.0f}}
 };
 
-uint32_t indices[4] =
+static uint32_t indices[4] =
 {
     0, 1, 2, 3
 };
@@ -74,7 +77,6 @@ int main()
 
     odin_get_physical_devices(render_device, &physical_devices_count, physical_devices);
 
-
     odin_set_physical_device(render_device, physical_devices[0], window);
     
 
@@ -93,10 +95,19 @@ int main()
     odin_index_buffer_create(render_device, &index_buffer, 4, indices);
 
 
+    /* Load the image using stb_image. */
+    int texture_width = 0, texture_height = 0, texture_channels = 0;
+    stbi_uc* texture_data = stbi_load("default.png", &texture_width, &texture_height, &texture_channels, 4);
 
+    assert(texture_data);
+
+    odin_texture_2d texture;
+    odin_texture_2d_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 3, odin_texture_2d_samples_1x, texture_width * texture_height * texture_channels, texture_data);
 
 
     /* Destroy resources. */
+    odin_texture_2d_destroy(render_device, texture);
+
     odin_index_buffer_destroy(render_device, index_buffer);
     odin_vertex_buffer_destroy(render_device, vertex_buffer);
 

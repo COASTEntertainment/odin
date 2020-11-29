@@ -161,8 +161,8 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     const char** device_extensions = odin_vulkan_platform_get_device_extensions(&device_extensions_count);
 
     /* Specify features */
-    VkPhysicalDeviceFeatures deviceFeatures = { 0 };
-    deviceFeatures.samplerAnisotropy = VK_TRUE;
+    VkPhysicalDeviceFeatures device_features = { 0 };
+    device_features.samplerAnisotropy = VK_TRUE;
 
     /* Build the logical device create info */
     VkDeviceCreateInfo device_create_info = { 0 };
@@ -175,7 +175,7 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     device_create_info.ppEnabledLayerNames = validation_layers;
     device_create_info.enabledExtensionCount = device_extensions_count;
     device_create_info.ppEnabledExtensionNames = device_extensions;
-    device_create_info.pEnabledFeatures = &deviceFeatures;
+    device_create_info.pEnabledFeatures = &device_features;
 
     /* Make sure it was created */
     if(vkCreateDevice(vulkan_render_device->physical_device, &device_create_info, NULL, &vulkan_render_device->device) != VK_SUCCESS)
@@ -213,7 +213,7 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     VkCommandPoolCreateInfo command_pool_create_info = { 0 };
     command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     command_pool_create_info.pNext = NULL;
-    command_pool_create_info.flags = 0;
+    command_pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     command_pool_create_info.queueFamilyIndex = vulkan_render_device->graphics_queue_index;
 
     vkCreateCommandPool(vulkan_render_device->device, &command_pool_create_info, NULL, &vulkan_render_device->command_pool);
