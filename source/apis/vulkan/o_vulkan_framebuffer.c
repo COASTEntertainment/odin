@@ -45,11 +45,22 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
     framebuffer_create_info.height = height;
     framebuffer_create_info.layers = 1;
 
+    vkCreateFramebuffer(vulkan_render_device->device, &framebuffer_create_info, NULL, &vulkan_framebuffer->framebuffer);
+
+    free(vulkan_attachments);
 
 }
 
 void odin_vulkan_framebuffer_destroy(odin_render_device render_device, odin_framebuffer framebuffer)
 {
+
+    /* Get the vulkan objects. */
+    odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
+
+    odin_vulkan_framebuffer vulkan_framebuffer = (odin_vulkan_framebuffer)framebuffer;
+
+    
+    vkDestroyFramebuffer(vulkan_render_device->device, vulkan_framebuffer->framebuffer, NULL);
 
 }
 
