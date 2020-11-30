@@ -4,7 +4,7 @@
 
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_vertex_assembly.h"
-
+#include "odin/apis/vulkan/o_vulkan_render_pass.h"
 
 
 void **odin_vulkan_pipeline_shader_load_code(const char* path)
@@ -19,7 +19,7 @@ void odin_vulkan_pipeline_shader_create(odin_render_device render_device, odin_s
 
 }
 
-void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader, int vertex_assemblys_count, odin_vertex_assembly* vertex_assemblys)
+void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader, odin_render_pass render_pass, int vertex_assemblys_count, odin_vertex_assembly* vertex_assemblys)
 {
     /* Get the vulkan render device. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
@@ -33,18 +33,8 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     odin_vulkan_shader vulkan_vertex_shader = (odin_vulkan_shader)vertex_shader;
     odin_vulkan_shader vulkan_fragment_shader = (odin_vulkan_shader)fragment_shader;
 
-
-    /* Create the pipeline layout. */
-    VkPipelineLayoutCreateInfo pipeline_layout_create_info = { 0 };
-    pipeline_layout_create_info.sType                   = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipeline_layout_create_info.pNext                   = NULL;
-    pipeline_layout_create_info.flags                   = 0;
-    pipeline_layout_create_info.setLayoutCount          = 0;
-    pipeline_layout_create_info.pSetLayouts             = NULL;
-    pipeline_layout_create_info.pushConstantRangeCount  = 0;
-    pipeline_layout_create_info.pPushConstantRanges     = NULL;
-
-    vkCreatePipelineLayout(vulkan_render_device->device, &pipeline_layout_create_info, NULL, &vulkan_pipeline->layout);
+    /* Get the vulkan render pass. */
+    odin_vulkan_render_pass vulkan_render_pass = (odin_vulkan_render_pass)render_pass;
 
 
     /* Create the shader stages. */
@@ -187,20 +177,47 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
 
     /* Create the color blend state. */
     VkPipelineColorBlendStateCreateInfo color_blend_state = { 0 };
-    color_blend_state.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    color_blend_state.pNext = NULL;
-    color_blend_state.flags = 0;
-    color_blend_state.logicOpEnable = VK_FALSE;
-    color_blend_state.logicOp = VK_LOGIC_OP_CLEAR;
-    color_blend_state.attachmentCount = 1;
-    color_blend_state.pAttachments = NULL;
-    color_blend_state.blendConstants[0] = 1.0f;
-    color_blend_state.blendConstants[1] = 1.0f;
-    color_blend_state.blendConstants[2] = 1.0f;
-    color_blend_state.blendConstants[3] = 1.0f;
+    color_blend_state.sType                 = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blend_state.pNext                 = NULL;
+    color_blend_state.flags                 = 0;
+    color_blend_state.logicOpEnable         = VK_FALSE;
+    color_blend_state.logicOp               = VK_LOGIC_OP_CLEAR;
+    color_blend_state.attachmentCount       = 0;
+    color_blend_state.pAttachments          = NULL;
+    color_blend_state.blendConstants[0]     = 1.0f;
+    color_blend_state.blendConstants[1]     = 1.0f;
+    color_blend_state.blendConstants[2]     = 1.0f;
+    color_blend_state.blendConstants[3]     = 1.0f;
     
+    /* Create the dynamic state. */
+    VkDynamicState dynamic_states[] =
+    {
+        VK_DYNAMIC_STATE_VIEWPORT,
+        VK_DYNAMIC_STATE_SCISSOR
+    };
+
+    VkPipelineDynamicStateCreateInfo dynamic_state = { 0 };
+    dynamic_state.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state.pNext                 = NULL;
+    dynamic_state.flags                 = 0;
+    dynamic_state.dynamicStateCount     = 2;
+    dynamic_state.pDynamicStates        = dynamic_states; 
 
 
+    /* Create the pipeline layout. */
+    VkPipelineLayoutCreateInfo pipeline_layout_create_info = { 0 };
+    pipeline_layout_create_info.sType                   = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipeline_layout_create_info.pNext                   = NULL;
+    pipeline_layout_create_info.flags                   = 0;
+    pipeline_layout_create_info.setLayoutCount          = 0;
+    pipeline_layout_create_info.pSetLayouts             = NULL;
+    pipeline_layout_create_info.pushConstantRangeCount  = 0;
+    pipeline_layout_create_info.pPushConstantRanges     = NULL;
+
+    vkCreatePipelineLayout(vulkan_render_device->device, &pipeline_layout_create_info, NULL, &vulkan_pipeline->layout);
+
+
+    /* Put it all together and make the graphics pipeline. */
     VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = { 0 };
     graphics_pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     graphics_pipeline_create_info.pNext = NULL;
@@ -215,7 +232,15 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     graphics_pipeline_create_info.pMultisampleState = &multisample_state;
     graphics_pipeline_create_info.pDepthStencilState = &depth_stencil_state;
     graphics_pipeline_create_info.pColorBlendState = &color_blend_state;
+    graphics_pipeline_create_info.pDynamicState = &dynamic_state;
+    graphics_pipeline_create_info.layout = vulkan_pipeline->layout;
+    graphics_pipeline_create_info.renderPass = vulkan_render_pass->render_pass;
+    graphics_pipeline_create_info.subpass = 0;
+    graphics_pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
+    graphics_pipeline_create_info.basePipelineIndex = -1;
 
+    vkCreateGraphicsPipelines(vulkan_render_device->device, VK_NULL_HANDLE, 1, &graphics_pipeline_create_info, NULL, &vulkan_pipeline->pipeline);
+    
 
 }
 
