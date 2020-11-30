@@ -37,6 +37,7 @@ list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_render_pass.c"
             "source/apis/vulkan/o_vulkan_pipeline.c"
             "source/apis/vulkan/o_vulkan_texture_2d.c"
+            "source/apis/vulkan/o_vulkan_framebuffer.c"
         )
 
         # Add vulkan platform specific sources

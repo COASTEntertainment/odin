@@ -105,6 +105,19 @@ int main()
     odin_texture_2d_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 3, odin_texture_2d_samples_1x, texture_width * texture_height * texture_channels, texture_data);
 
 
+    /*
+    odin_draw_prepare(render_device);
+
+
+    while(true)
+    {
+        odin_draw_frame(render_device, cube_draw);
+    }
+
+    odin_draw_done(render_device);
+    */
+
+
     /* Destroy resources. */
     odin_texture_2d_destroy(render_device, texture);
 

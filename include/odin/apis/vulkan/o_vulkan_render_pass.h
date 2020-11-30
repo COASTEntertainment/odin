@@ -10,7 +10,7 @@
 typedef struct odin_vulkan_render_pass
 {
 
-    int test;
+    VkRenderPass render_pass;
 
 } odin_vulkan_render_pass_t, *odin_vulkan_render_pass;
 

@@ -125,11 +125,6 @@ void odin_vulkan_texture_2d_create(odin_render_device render_device, odin_textur
     vmaUnmapMemory(vulkan_render_device->memory_allocator, staging_buffer_allocation);
 
     
-
-
-
-
-
     /* Create the vulkan image. */
     VkImageCreateInfo image_create_info = { 0 };
     image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
