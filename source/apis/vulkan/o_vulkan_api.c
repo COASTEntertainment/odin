@@ -30,6 +30,7 @@ void odin_vulkan_api_load()
 
     odin_image_create = odin_vulkan_image_create;
     odin_image_destroy = odin_vulkan_image_destroy;
+    odin_image_upload_data = odin_vulkan_image_upload_data;
 
     odin_framebuffer_create = odin_vulkan_framebuffer_create;
     odin_framebuffer_destroy = odin_vulkan_framebuffer_destroy;

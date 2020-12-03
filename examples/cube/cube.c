@@ -104,12 +104,13 @@ int main()
     odin_image texture;
     odin_image_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 1, 3, odin_image_samples_1x);
 
+    odin_image_upload_data(render_device, texture, texture_data);
 
 
     /* Create the render passes. */
-
     odin_image albedo_frame;
     odin_image_create(render_device, &albedo_frame, odin_image_format_rgba_8_srgb, 1080, 720, 1, 1, odin_image_samples_1x);
+
 
 
     /*

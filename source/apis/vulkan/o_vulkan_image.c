@@ -156,10 +156,11 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
         ODIN_ERROR("o_vulkan_image.c", "Can not have mips with samples greater than 1x!");
     }
 
-    vulkan_image->o_width     = width;
-    vulkan_image->o_height    = height;
-    vulkan_image->o_depth     = depth;
-    vulkan_image->o_format    = format;
+    vulkan_image->o_width       = width;
+    vulkan_image->o_height      = height;
+    vulkan_image->o_depth       = depth;
+    vulkan_image->o_format      = format;
+    vulkan_image->o_mip_levels  = mip_levels;
 
     vulkan_image->format    = vulkan_formats[format];
     vulkan_image->samples   = vulkan_samples[samples];
