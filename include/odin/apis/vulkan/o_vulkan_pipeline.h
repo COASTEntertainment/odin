@@ -8,8 +8,16 @@
 #include <vulkan/vulkan.h>
 
 
+typedef struct odin_vulkan_shader_code
+{
+
+    char** code;
+    uint32_t code_size;
+
+} odin_vulkan_shader_code_t, *odin_vulkan_shader_code;
+
 /** \brief The vulkan interpretation of a shader. */
-typedef struct odin_vulkan_shader_t
+typedef struct odin_vulkan_shader
 {
 
     VkShaderModule module;
@@ -17,7 +25,7 @@ typedef struct odin_vulkan_shader_t
 } odin_vulkan_shader_t, *odin_vulkan_shader;
 
 /** \brief The vulkan */
-typedef struct odin_vulkan_pipeline_t
+typedef struct odin_vulkan_pipeline
 {
 
     VkPipeline pipeline;
@@ -27,10 +35,10 @@ typedef struct odin_vulkan_pipeline_t
 
 
 /** \brief Loads shader code on an API basis. */
-void **odin_vulkan_pipeline_shader_load_code(const char* path);
+void odin_vulkan_pipeline_shader_load_code(odin_shader_code* shader_code, const char* path);
 
 /** \brief Creates a shader for a pipeline. */
-void odin_vulkan_pipeline_shader_create(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, void **shader_code);
+void odin_vulkan_pipeline_shader_create(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, odin_shader_code code);
 
 /** \brief Creates a pipeline from shaders.  */
 void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader, odin_render_pass render_pass, int vertex_assemblys_count, odin_vertex_assembly* vertex_assemblys);

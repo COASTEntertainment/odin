@@ -4,7 +4,7 @@
 
 #include "odin/o_framebuffer.h"
 #include "odin/o_render_pass.h"
-#include "odin/o_texture_2d.h"
+#include "odin/o_image.h"
 
 #include <vulkan/vulkan.h>
 
@@ -17,7 +17,7 @@ typedef struct odin_vulkan_framebuffer
 } odin_vulkan_framebuffer_t, *odin_vulkan_framebuffer;
 
 
-void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_framebuffer* framebuffer, int width, int height, odin_render_pass render_pass, int attachments_count, odin_texture_2d* attachments);
+void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_framebuffer* framebuffer, int width, int height, odin_render_pass render_pass, int attachments_count, odin_image* attachments);
 
 void odin_vulkan_framebuffer_destroy(odin_render_device render_device, odin_framebuffer framebuffer);
 

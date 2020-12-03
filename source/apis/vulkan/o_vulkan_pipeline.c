@@ -1,21 +1,67 @@
 #include "odin/apis/vulkan/o_vulkan_pipeline.h"
 
+#include <stdio.h>
+
 #include "aero/a_memory.h"
+
+#include "odin/o_log.h"
 
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_vertex_assembly.h"
 #include "odin/apis/vulkan/o_vulkan_render_pass.h"
 
 
-void **odin_vulkan_pipeline_shader_load_code(const char* path)
+void odin_vulkan_pipeline_shader_load_code(odin_shader_code* shader_code, const char* path)
 {
-    return NULL;
+    
+    FILE *file;
+    file = fopen(path, "r");
+
+    if(!file)
+    {
+        ODIN_ERROR("o_vulkan_pipeline.c", "Could not open a shader file!");
+    }
+
+    /* Create the vulkan shader code. */
+    odin_vulkan_shader_code vulkan_shader_code = malloc(sizeof(odin_vulkan_shader_code_t));
+    *shader_code = (odin_shader_code)vulkan_shader_code;
+
+
+    size_t file_size = (size_t)ftell(file);
+
+    char* buffer = malloc(sizeof(char) * file_size);
+
+    /* Read the file to the buffer. */
+    fseek(file, 0, 0);
+    fread(buffer, sizeof(char), file_size, file);
+
+    fclose(file);
+
+    vulkan_shader_code->code = &buffer;
+    vulkan_shader_code->code_size = (uint32_t)file_size;
+
 }
 
-void odin_vulkan_pipeline_shader_create(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, void **shader_code)
+void odin_vulkan_pipeline_shader_create(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, odin_shader_code shader_code)
 {
 
+    /* Get the vulkan objects. */
+    odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
+    odin_vulkan_shader_code vulkan_shader_code = (odin_vulkan_shader_code)shader_code;
+
+    odin_vulkan_shader vulkan_shader = malloc(sizeof(odin_vulkan_shader_t));
+    *shader = (odin_shader)vulkan_shader;
+
+
+    VkShaderModuleCreateInfo shader_module_create_info = { 0 };
+    shader_module_create_info.sType =       VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shader_module_create_info.pNext =       NULL;
+    shader_module_create_info.flags =       0;
+    shader_module_create_info.codeSize =    vulkan_shader_code->code_size;
+    shader_module_create_info.pCode =       (uint32_t*)vulkan_shader_code->code;
+
+    vkCreateShaderModule(vulkan_render_device->device, &shader_module_create_info, NULL, &vulkan_shader->module);
 
 }
 
@@ -112,10 +158,10 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
 
     /* Create the tesselation state. */
     VkPipelineTessellationStateCreateInfo tessellation_state = { 0 };
-    tessellation_state.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
-    tessellation_state.pNext = NULL;
-    tessellation_state.flags = 0;
-    tessellation_state.patchControlPoints = 0;
+    tessellation_state.sType                = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
+    tessellation_state.pNext                = NULL;
+    tessellation_state.flags                = 0;
+    tessellation_state.patchControlPoints   = 0;
 
 
     /* Create the viewport state. */
@@ -161,18 +207,18 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
 
     /* Create the depth stencil state. */
     VkPipelineDepthStencilStateCreateInfo depth_stencil_state = { 0 };
-    depth_stencil_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depth_stencil_state.pNext = NULL;
-    depth_stencil_state.flags = 0;
-    depth_stencil_state.depthTestEnable = VK_FALSE;
-    depth_stencil_state.depthWriteEnable = VK_FALSE;
-    depth_stencil_state.depthCompareOp = VK_COMPARE_OP_NEVER;
-    depth_stencil_state.depthBoundsTestEnable = VK_FALSE;
-    depth_stencil_state.stencilTestEnable = VK_FALSE;
-    depth_stencil_state.front = (VkStencilOpState){ 0 };
-    depth_stencil_state.back = (VkStencilOpState){ 0 };
-    depth_stencil_state.minDepthBounds = 0.0f;
-    depth_stencil_state.maxDepthBounds = 0.0f;
+    depth_stencil_state.sType                   = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depth_stencil_state.pNext                   = NULL;
+    depth_stencil_state.flags                   = 0;
+    depth_stencil_state.depthTestEnable         = VK_FALSE;
+    depth_stencil_state.depthWriteEnable        = VK_FALSE;
+    depth_stencil_state.depthCompareOp          = VK_COMPARE_OP_NEVER;
+    depth_stencil_state.depthBoundsTestEnable   = VK_FALSE;
+    depth_stencil_state.stencilTestEnable       = VK_FALSE;
+    depth_stencil_state.front                   = (VkStencilOpState){ 0 };
+    depth_stencil_state.back                    = (VkStencilOpState){ 0 };
+    depth_stencil_state.minDepthBounds          = 0.0f;
+    depth_stencil_state.maxDepthBounds          = 0.0f;
 
 
     /* Create the color blend state. */
@@ -219,25 +265,25 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
 
     /* Put it all together and make the graphics pipeline. */
     VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = { 0 };
-    graphics_pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    graphics_pipeline_create_info.pNext = NULL;
-    graphics_pipeline_create_info.flags = 0;
-    graphics_pipeline_create_info.stageCount = 2;
-    graphics_pipeline_create_info.pStages = shader_pipeline_stages;
-    graphics_pipeline_create_info.pVertexInputState = &vertex_pipeline_state;
-    graphics_pipeline_create_info.pInputAssemblyState = &input_assembly_state;
-    graphics_pipeline_create_info.pTessellationState = &tessellation_state;
-    graphics_pipeline_create_info.pViewportState = &viewport_state;
-    graphics_pipeline_create_info.pRasterizationState = &rasterization_state;
-    graphics_pipeline_create_info.pMultisampleState = &multisample_state;
-    graphics_pipeline_create_info.pDepthStencilState = &depth_stencil_state;
-    graphics_pipeline_create_info.pColorBlendState = &color_blend_state;
-    graphics_pipeline_create_info.pDynamicState = &dynamic_state;
-    graphics_pipeline_create_info.layout = vulkan_pipeline->layout;
-    graphics_pipeline_create_info.renderPass = vulkan_render_pass->render_pass;
-    graphics_pipeline_create_info.subpass = 0;
-    graphics_pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
-    graphics_pipeline_create_info.basePipelineIndex = -1;
+    graphics_pipeline_create_info.sType                 = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    graphics_pipeline_create_info.pNext                 = NULL;
+    graphics_pipeline_create_info.flags                 = 0;
+    graphics_pipeline_create_info.stageCount            = 2;
+    graphics_pipeline_create_info.pStages               = shader_pipeline_stages;
+    graphics_pipeline_create_info.pVertexInputState     = &vertex_pipeline_state;
+    graphics_pipeline_create_info.pInputAssemblyState   = &input_assembly_state;
+    graphics_pipeline_create_info.pTessellationState    = &tessellation_state;
+    graphics_pipeline_create_info.pViewportState        = &viewport_state;
+    graphics_pipeline_create_info.pRasterizationState   = &rasterization_state;
+    graphics_pipeline_create_info.pMultisampleState     = &multisample_state;
+    graphics_pipeline_create_info.pDepthStencilState    = &depth_stencil_state;
+    graphics_pipeline_create_info.pColorBlendState      = &color_blend_state;
+    graphics_pipeline_create_info.pDynamicState         = &dynamic_state;
+    graphics_pipeline_create_info.layout                = vulkan_pipeline->layout;
+    graphics_pipeline_create_info.renderPass            = vulkan_render_pass->render_pass;
+    graphics_pipeline_create_info.subpass               = 0;
+    graphics_pipeline_create_info.basePipelineHandle    = VK_NULL_HANDLE;
+    graphics_pipeline_create_info.basePipelineIndex     = -1;
 
     vkCreateGraphicsPipelines(vulkan_render_device->device, VK_NULL_HANDLE, 1, &graphics_pipeline_create_info, NULL, &vulkan_pipeline->pipeline);
     

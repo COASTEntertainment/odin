@@ -28,7 +28,13 @@ void odin_vulkan_api_load()
     odin_index_buffer_create = odin_vulkan_index_buffer_create;
     odin_index_buffer_destroy = odin_vulkan_index_buffer_destroy;
 
-    odin_texture_2d_create = odin_vulkan_texture_2d_create;
-    odin_texture_2d_destroy = odin_vulkan_texture_2d_destroy;
+    odin_image_create = odin_vulkan_image_create;
+    odin_image_destroy = odin_vulkan_image_destroy;
+
+    odin_framebuffer_create = odin_vulkan_framebuffer_create;
+    odin_framebuffer_destroy = odin_vulkan_framebuffer_destroy;
+
+    odin_render_pass_create = odin_vulkan_render_pass_create;
+    odin_render_pass_destroy = odin_vulkan_render_pass_destroy;
 
 }

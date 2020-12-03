@@ -2,10 +2,10 @@
 
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_render_pass.h"
-#include "odin/apis/vulkan/o_vulkan_texture_2d.h"
+#include "odin/apis/vulkan/o_vulkan_image.h"
 
 
-void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_framebuffer* framebuffer, int width, int height, odin_render_pass render_pass, int attachments_count, odin_texture_2d* attachments)
+void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_framebuffer* framebuffer, int width, int height, odin_render_pass render_pass, int attachments_count, odin_image* attachments)
 {
 
     /* Get the vulkan objects. */
@@ -27,7 +27,7 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
     {
 
         /* Get the vulkan texture. */
-        odin_vulkan_texture_2d vulkan_texture = (odin_vulkan_texture_2d)attachments[i];
+        odin_vulkan_image vulkan_texture = (odin_vulkan_image)attachments[i];
         
         vulkan_attachments[i] = vulkan_texture->image_view;
 

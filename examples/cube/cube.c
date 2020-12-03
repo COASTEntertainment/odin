@@ -101,8 +101,15 @@ int main()
 
     assert(texture_data);
 
-    odin_texture_2d texture;
-    odin_texture_2d_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 3, odin_texture_2d_samples_1x, texture_width * texture_height * texture_channels, texture_data);
+    odin_image texture;
+    odin_image_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 1, 3, odin_image_samples_1x);
+
+
+
+    /* Create the render passes. */
+
+    odin_image albedo_frame;
+    odin_image_create(render_device, &albedo_frame, odin_image_format_rgba_8_srgb, 1080, 720, 1, 1, odin_image_samples_1x);
 
 
     /*
@@ -119,7 +126,9 @@ int main()
 
 
     /* Destroy resources. */
-    odin_texture_2d_destroy(render_device, texture);
+    odin_image_destroy(render_device, albedo_frame);
+
+    odin_image_destroy(render_device, texture);
 
     odin_index_buffer_destroy(render_device, index_buffer);
     odin_vertex_buffer_destroy(render_device, vertex_buffer);

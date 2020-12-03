@@ -4,16 +4,17 @@
 
 #include "o_render_pass.h"
 #include "o_render_device.h"
+#include "o_image.h"
 
 
 typedef struct odin_render_pass_t *odin_render_pass;
 
 
 /** \brief Creates a render pass. */
-void odin_render_pass_create(odin_render_device render_device, odin_render_pass* render_pass);
+void ( *odin_render_pass_create)(odin_render_device render_device, odin_render_pass* render_pass, int attachment_count, odin_image* attachments);
 
 /** \brief Destroys a render pass. */
-void odin_render_pass_destroy(odin_render_device render_device, odin_render_pass render_pass);
+void ( *odin_render_pass_destroy)(odin_render_device render_device, odin_render_pass render_pass);
 
 
 

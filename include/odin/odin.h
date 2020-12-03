@@ -10,8 +10,11 @@
 #include "o_vertex_assembly.h"
 #include "o_vertex_buffer.h"
 #include "o_index_buffer.h"
-#include "o_texture_2d.h"
+#include "o_image.h"
+#include "o_render_pass.h"
+#include "o_framebuffer.h"
 #include "o_draw_data.h"
+
 
 
 

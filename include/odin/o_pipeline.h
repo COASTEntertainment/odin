@@ -7,6 +7,9 @@
 #include "o_render_pass.h"
 
 
+/** \brief Data about a shaders code. */
+typedef struct odin_shader_code *odin_shader_code;
+
 /** \brief A shader controls parts of the render pipeline. */
 typedef struct odin_shader *odin_shader;
 
@@ -24,7 +27,7 @@ typedef enum odin_shader_stage
 
 
 /** \brief Loads shader code on an API basis. */
-void **( *odin_pipeline_shader_load_code)(const char* path);
+void ( *odin_pipeline_shader_load_code)(odin_shader_code* shader_code, const char* path);
 
 /** \brief Creates a shader for a pipeline. */
 void ( *odin_pipeline_shader_create)(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, void **shader_code);
