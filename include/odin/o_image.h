@@ -22,28 +22,25 @@ typedef enum odin_image_format
     */
 
     odin_image_format_r_8_u_int           = 0,
-    odin_image_format_r_16_u_int          = 1,
-    odin_image_format_r_32_u_int          = 2,
+    odin_image_format_r_32_u_int          = 1,
 
-    odin_image_format_r_8_int             = 3,
-    odin_image_format_r_16_int            = 4,
-    odin_image_format_r_32_int            = 5,
+    odin_image_format_r_8_int             = 2,
+    odin_image_format_r_32_int            = 3,
 
-    odin_image_format_r_32_float          = 6,
+    odin_image_format_r_32_float          = 4,
 
-    odin_image_format_rg_8_u_int          = 7,
-    odin_image_format_rg_16_u_int         = 8,
-    odin_image_format_rg_32_u_int         = 9,
+    odin_image_format_rg_8_u_int          = 5,
+    odin_image_format_rg_32_u_int         = 6,
 
-    odin_image_format_rg_32_float         = 11,
+    odin_image_format_rg_32_float         = 7,
 
-    odin_image_format_rgb_8_srgb          = 12,
+    odin_image_format_rgb_8_srgb          = 8,
 
-    odin_image_format_rgb_32_float        = 14,
+    odin_image_format_rgb_32_float        = 9,
 
-    odin_image_format_rgba_8_srgb         = 15,
+    odin_image_format_rgba_8_srgb         = 10,
 
-    odin_image_format_rgba_32_float       = 17,
+    odin_image_format_rgba_32_float       = 11,
 
 
 

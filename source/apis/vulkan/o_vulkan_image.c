@@ -19,10 +19,6 @@ uint32_t get_format_size(odin_image_format format)
         return sizeof(uint8_t);
         break;
     
-    case odin_image_format_r_16_u_int:
-        return sizeof(uint16_t);
-        break;
-    
     case odin_image_format_r_32_u_int:
         return sizeof(uint32_t);
         break;
@@ -32,9 +28,6 @@ uint32_t get_format_size(odin_image_format format)
         return sizeof(int8_t);
         break;
 
-    case odin_image_format_r_16_int:
-        return sizeof(int16_t);
-        break;
 
     case odin_image_format_r_32_int:
         return sizeof(int32_t);
@@ -48,10 +41,6 @@ uint32_t get_format_size(odin_image_format format)
 
     case odin_image_format_rg_8_u_int:
         return sizeof(uint8_t) * 2;
-        break;
-
-    case odin_image_format_rg_16_u_int:
-        return sizeof(uint16_t) * 2;
         break;
     
     case odin_image_format_rg_32_u_int:
@@ -186,7 +175,7 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
     image_create_info.arrayLayers = 1;
     image_create_info.samples = vulkan_samples[samples];
     image_create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-    image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     image_create_info.queueFamilyIndexCount = 0;
     image_create_info.pQueueFamilyIndices = NULL;
@@ -220,10 +209,10 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
     image_view_create_info.image = vulkan_image->image;
     image_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
     image_view_create_info.format = vulkan_formats[format];
-    image_view_create_info.components.r = 1.0f;
-    image_view_create_info.components.g = 1.0f;
-    image_view_create_info.components.b = 1.0f;
-    image_view_create_info.components.a = 1.0f;
+    image_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    image_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    image_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    image_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
     image_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     image_view_create_info.subresourceRange.baseMipLevel = 0;
     image_view_create_info.subresourceRange.levelCount = mip_levels;
@@ -243,7 +232,7 @@ void odin_vulkan_image_upload_data(odin_render_device render_device, odin_image 
 
     odin_vulkan_image vulkan_image = (odin_vulkan_image)image;
 
-    int size = vulkan_image->o_width * vulkan_image->o_height * vulkan_image->o_depth * get_format_size(vulkan_image->format);
+    int size = vulkan_image->o_width * vulkan_image->o_height * vulkan_image->o_depth * get_format_size(vulkan_image->o_format);
 
 
 
@@ -274,7 +263,7 @@ void odin_vulkan_image_upload_data(odin_render_device render_device, odin_image 
     VmaAllocationInfo allocation_info = { 0 };
 
 
-    vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &staging_buffer, &staging_buffer_allocation, &allocation_info);
+    VkResult res =  vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &staging_buffer, &staging_buffer_allocation, &allocation_info);
 
 
     /* Copy the image data to the buffer. */

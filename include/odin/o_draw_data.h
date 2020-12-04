@@ -9,7 +9,7 @@
 typedef struct odin_draw_data_t *odin_draw_data;
 
 
-typedef void( *odin_draw_func)(odin_render_device render_device, odin_draw_data draw_data);
+typedef void( *odin_draw_func)(odin_render_device render_device, odin_draw_data draw_data, void* user_data);
 
 
 #endif /* __ODIN_DRAW_DATA_H__ */

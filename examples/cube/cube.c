@@ -7,7 +7,7 @@
 #include "stb_image.h"
 
 
-void cube_draw(odin_render_device render_device, odin_draw_data draw_data);
+void cube_draw(odin_render_device render_device, odin_draw_data draw_data, void* user_data);
 
 
 typedef struct default_vertex
@@ -33,10 +33,25 @@ static uint32_t indices[4] =
 };
 
 
+typedef struct cube_example_data
+{
+
+    odin_render_pass        gbuffer;
+    odin_framebuffer        gbuffer_framebuffer;
+    odin_vertex_buffer      vertex_buffer;
+    odin_index_buffer       index_buffer;
+    odin_pipeline           pipeline;
+
+} cube_example_data;
+
+cube_example_data cube_data = { 0 };
+
+
 int main()
 {
 
-    odin_load_api(odin_api_vulkan);
+    odin_api choosen_api = odin_api_vulkan;
+    odin_load_api(choosen_api);
 
     odin_initialize_info initialize_info = { 0 };
     initialize_info.application_name = "Cube Example";
@@ -108,9 +123,40 @@ int main()
 
 
     /* Create the render passes. */
-    odin_image albedo_frame;
-    odin_image_create(render_device, &albedo_frame, odin_image_format_rgba_8_srgb, 1080, 720, 1, 1, odin_image_samples_1x);
+    odin_image color_frame;
+    odin_image_create(render_device, &color_frame, odin_image_format_rgba_8_srgb, 1080, 720, 1, 1, odin_image_samples_1x);
 
+    odin_render_pass_create(render_device, &cube_data.gbuffer, 1, &color_frame);
+
+    odin_framebuffer_create(render_device, &cube_data.gbuffer_framebuffer, 1080, 720, cube_data.gbuffer, 1, &color_frame);
+
+
+    
+    odin_shader_code simple_shader_vert_code;
+    odin_shader_code simple_shader_frag_code;
+
+    switch (choosen_api)
+    {
+    /* For vulkan we must load spirv. */
+    case odin_api_vulkan:
+        odin_pipeline_shader_load_code(&simple_shader_vert_code, "shaders/vulkan/simple_shader_vert.spv");
+        odin_pipeline_shader_load_code(&simple_shader_frag_code, "shaders/vulkan/simple_shader_frag.spv");
+        break;
+    
+    default:
+        break;
+    }
+
+
+    odin_shader simple_shader_vert;
+    odin_shader simple_shader_frag;
+
+    odin_pipeline_shader_create(render_device, &simple_shader_vert, odin_shader_stage_vertex, simple_shader_vert_code);
+    odin_pipeline_shader_create(render_device, &simple_shader_frag, odin_shader_stage_fragment, simple_shader_frag_code);
+
+
+    odin_pipeline simple_shader;
+    odin_pipeline_create(render_device, &simple_shader, simple_shader_vert, simple_shader_frag, cube_data.gbuffer, 1, &vertex_assembly);
 
 
     /*
@@ -127,7 +173,13 @@ int main()
 
 
     /* Destroy resources. */
-    odin_image_destroy(render_device, albedo_frame);
+    odin_pipeline_destroy(render_device, simple_shader);
+
+    odin_framebuffer_destroy(render_device, cube_data.gbuffer_framebuffer);
+
+    odin_render_pass_destroy(render_device, cube_data.gbuffer);
+
+    odin_image_destroy(render_device, color_frame);
 
     odin_image_destroy(render_device, texture);
 
@@ -143,8 +195,19 @@ int main()
 }
 
 
-void cube_draw(odin_render_device render_device, odin_draw_data render_data)
+void cube_draw(odin_render_device render_device, odin_draw_data draw_data, void* user_data)
 {
+
+    cube_example_data* draw_cube_data = (cube_example_data*)user_data;
+
+    odin_draw_command_begin_render_pass(render_device, draw_data, draw_cube_data->gbuffer, draw_cube_data->gbuffer_framebuffer);
+
+        odin_draw_command_set_vertex_buffer(render_device, draw_data, draw_cube_data->vertex_buffer);
+        odin_draw_command_set_index_buffer(render_device, draw_data, draw_cube_data->index_buffer);
+
+        odin_draw_command_set_pipeline(render_device, draw_data, draw_cube_data->pipeline);
+
+    odin_draw_command_end_render_pass(render_device, draw_data, draw_cube_data->gbuffer);
 
 }
 

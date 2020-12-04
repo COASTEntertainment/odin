@@ -11,7 +11,7 @@
 typedef struct odin_vulkan_shader_code
 {
 
-    char** code;
+    unsigned char* code;
     uint32_t code_size;
 
 } odin_vulkan_shader_code_t, *odin_vulkan_shader_code;

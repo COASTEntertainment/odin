@@ -30,7 +30,7 @@ typedef enum odin_shader_stage
 void ( *odin_pipeline_shader_load_code)(odin_shader_code* shader_code, const char* path);
 
 /** \brief Creates a shader for a pipeline. */
-void ( *odin_pipeline_shader_create)(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, void **shader_code);
+void ( *odin_pipeline_shader_create)(odin_render_device render_device, odin_shader *shader, odin_shader_stage stage, odin_shader_code shader_code);
 
 /** \brief Creates a pipeline from shaders.  */
 void ( *odin_pipeline_create)(odin_render_device render_device, odin_pipeline *pipeline, odin_shader vertex_shader, odin_shader fragment_shader, odin_render_pass render_pass, int vertex_assemblys_count, odin_vertex_assembly* vertex_assemblys);

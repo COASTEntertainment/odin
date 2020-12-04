@@ -13,7 +13,7 @@ void odin_vulkan_render_pass_create(odin_render_device render_device, odin_rende
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
     odin_vulkan_render_pass vulkan_render_pass = malloc(sizeof(odin_vulkan_render_pass_t));
-    *render_pass = (odin_render_pass)render_pass;
+    *render_pass = (odin_render_pass)vulkan_render_pass;
 
 
     /* Allocate the attachments array. */
@@ -38,21 +38,21 @@ void odin_vulkan_render_pass_create(odin_render_device render_device, odin_rende
         attachment.stencilLoadOp    = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachment.stencilStoreOp   = VK_ATTACHMENT_STORE_OP_STORE;
         attachment.initialLayout    = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout      = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        attachment.finalLayout      = VK_IMAGE_LAYOUT_GENERAL;
 
         aero_memcpy(&vulkan_attachments[i], sizeof(VkAttachmentDescription), &attachment, sizeof(VkAttachmentDescription));
 
         VkAttachmentReference attachment_reference = { 0 };
         attachment_reference.attachment     = i;
-        attachment_reference.layout         = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachment_reference.layout         = VK_IMAGE_LAYOUT_GENERAL;
 
         VkSubpassDescription subpass = { 0 };
         subpass.flags                       = 0;
         subpass.pipelineBindPoint           = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.inputAttachmentCount        = 1;
-        subpass.pInputAttachments           = &attachment_reference;
-        subpass.colorAttachmentCount        = 0;
-        subpass.pColorAttachments           = NULL;
+        subpass.inputAttachmentCount        = 0;
+        subpass.pInputAttachments           = NULL;
+        subpass.colorAttachmentCount        = 1;
+        subpass.pColorAttachments           = &attachment_reference;
         subpass.pResolveAttachments         = NULL;
         subpass.pDepthStencilAttachment     = NULL;
         subpass.preserveAttachmentCount     = 0;
@@ -74,7 +74,7 @@ void odin_vulkan_render_pass_create(odin_render_device render_device, odin_rende
     render_pass_create_info.dependencyCount         = 0;
     render_pass_create_info.pDependencies           = NULL;
 
-    vkCreateRenderPass(vulkan_render_device->device, &render_pass_create_info, NULL, &vulkan_render_pass->render_pass);
+    VkResult res = vkCreateRenderPass(vulkan_render_device->device, &render_pass_create_info, NULL, &vulkan_render_pass->render_pass);
 
 }
 

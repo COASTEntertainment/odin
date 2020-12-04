@@ -28,6 +28,11 @@ void odin_vulkan_api_load()
     odin_index_buffer_create = odin_vulkan_index_buffer_create;
     odin_index_buffer_destroy = odin_vulkan_index_buffer_destroy;
 
+    odin_pipeline_shader_load_code = odin_vulkan_pipeline_shader_load_code;
+    odin_pipeline_shader_create = odin_vulkan_pipeline_shader_create;
+    odin_pipeline_create = odin_vulkan_pipeline_create;
+    odin_pipeline_destroy = odin_vulkan_pipeline_destroy;
+
     odin_image_create = odin_vulkan_image_create;
     odin_image_destroy = odin_vulkan_image_destroy;
     odin_image_upload_data = odin_vulkan_image_upload_data;

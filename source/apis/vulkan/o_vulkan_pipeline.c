@@ -11,33 +11,46 @@
 #include "odin/apis/vulkan/o_vulkan_render_pass.h"
 
 
+#define SPIRV_MAGIC 0x07230203 
+
 void odin_vulkan_pipeline_shader_load_code(odin_shader_code* shader_code, const char* path)
 {
     
     FILE *file;
-    file = fopen(path, "r");
+    file = fopen(path, "rb");
 
     if(!file)
     {
         ODIN_ERROR("o_vulkan_pipeline.c", "Could not open a shader file!");
     }
 
+
+    uint32_t magic;
+    fread(&magic, 4, 1, file);
+    if( magic != SPIRV_MAGIC )
+    {
+        ODIN_ERROR("o_vulkan_pipeline.c", "Invalid spir-v magic number!");
+    }
+
+
     /* Create the vulkan shader code. */
     odin_vulkan_shader_code vulkan_shader_code = malloc(sizeof(odin_vulkan_shader_code_t));
     *shader_code = (odin_shader_code)vulkan_shader_code;
 
 
+    fseek(file, 0L, SEEK_END);
     size_t file_size = (size_t)ftell(file);
 
-    char* buffer = malloc(sizeof(char) * file_size);
+
+    unsigned char* buffer = malloc(sizeof(unsigned char) * file_size);
 
     /* Read the file to the buffer. */
     fseek(file, 0, 0);
-    fread(buffer, sizeof(char), file_size, file);
+    fread(buffer, file_size, 1, file);
 
     fclose(file);
 
-    vulkan_shader_code->code = &buffer;
+    vulkan_shader_code->code = buffer;
     vulkan_shader_code->code_size = (uint32_t)file_size;
 
 }
@@ -186,9 +199,9 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     rasterization_state.cullMode                    = VK_CULL_MODE_BACK_BIT;
     rasterization_state.frontFace                   = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterization_state.depthBiasEnable             = VK_FALSE;
-    rasterization_state.depthBiasConstantFactor     = 1.0f;
-    rasterization_state.depthBiasClamp              = 1.0f;
-    rasterization_state.depthBiasSlopeFactor        = 1.0f;
+    rasterization_state.depthBiasConstantFactor     = 0.0f;
+    rasterization_state.depthBiasClamp              = 0.0f;
+    rasterization_state.depthBiasSlopeFactor        = 0.0f;
     rasterization_state.lineWidth                   = 1.0f;
 
 
@@ -287,10 +300,21 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
 
     vkCreateGraphicsPipelines(vulkan_render_device->device, VK_NULL_HANDLE, 1, &graphics_pipeline_create_info, NULL, &vulkan_pipeline->pipeline);
     
+    vkDestroyShaderModule(vulkan_render_device->device, vulkan_vertex_shader->module, NULL);
+    vkDestroyShaderModule(vulkan_render_device->device, vulkan_fragment_shader->module, NULL);
 
 }
 
 void odin_vulkan_pipeline_destroy(odin_render_device render_device, odin_pipeline pipeline)
 {
+
+    /* Get the vulkan objects. */
+    odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
+
+    odin_vulkan_pipeline vulkan_pipeline = (odin_vulkan_pipeline)pipeline;
+
+
+    vkDestroyPipeline(vulkan_render_device->device, vulkan_pipeline->pipeline, NULL);
+    vkDestroyPipelineLayout(vulkan_render_device->device, vulkan_pipeline->layout, NULL);
 
 }
