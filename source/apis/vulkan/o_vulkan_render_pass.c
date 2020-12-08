@@ -62,6 +62,14 @@ void odin_vulkan_render_pass_create(odin_render_device render_device, odin_rende
 
     }
 
+    VkSubpassDependency dependency = { 0 };
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    
 
     VkRenderPassCreateInfo render_pass_create_info = { 0 };
     render_pass_create_info.sType                   = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -71,8 +79,8 @@ void odin_vulkan_render_pass_create(odin_render_device render_device, odin_rende
     render_pass_create_info.pAttachments            = vulkan_attachments;
     render_pass_create_info.subpassCount            = attachments_count;
     render_pass_create_info.pSubpasses              = subpasses;
-    render_pass_create_info.dependencyCount         = 0;
-    render_pass_create_info.pDependencies           = NULL;
+    render_pass_create_info.dependencyCount         = 1;
+    render_pass_create_info.pDependencies           = &dependency;
 
     VkResult res = vkCreateRenderPass(vulkan_render_device->device, &render_pass_create_info, NULL, &vulkan_render_pass->render_pass);
 

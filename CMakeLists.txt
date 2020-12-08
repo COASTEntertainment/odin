@@ -38,6 +38,7 @@ list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_pipeline.c"
             "source/apis/vulkan/o_vulkan_image.c"
             "source/apis/vulkan/o_vulkan_framebuffer.c"
+            "source/apis/vulkan/o_vulkan_draw.c"
         )
 
         # Add vulkan platform specific sources

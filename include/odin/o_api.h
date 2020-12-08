@@ -12,7 +12,13 @@ typedef enum odin_api
 } odin_api;
 
 
-/** \brief Loads the function pointers to the respective Render API enum. */
+/** \brief Loads the function pointers to the respective Render API enum. 
+ * 
+ * Odin Descripion:
+ *  This function should load a specific apis function pointers to
+ *  their correct addresses.
+ * 
+*/
 void odin_load_api(odin_api api);
 
 

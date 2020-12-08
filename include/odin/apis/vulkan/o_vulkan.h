@@ -13,6 +13,7 @@
 #include "o_vulkan_framebuffer.h"
 #include "o_vulkan_render_pass.h"
 #include "o_vulkan_pipeline.h"
+#include "o_vulkan_draw.h"
 
 
 

@@ -105,6 +105,8 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
         NULL                                            // Additional application data
         );
 
+    SetWindowLongPtr(vulkan_windows_window->handle, GWLP_USERDATA, vulkan_windows_window);
+
 
     /* Make sure the style is correct. */
     switch (style)
@@ -139,7 +141,6 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
     if(vulkan_render_device->device)
     {
         odin_vulkan_window_swapchain_create(vulkan_render_device, vulkan_window);
-        odin_vulkan_window_resources_create(vulkan_render_device, vulkan_window);
     }
 
 }
@@ -153,7 +154,6 @@ void odin_vulkan_window_destroy(odin_render_device render_device, odin_window wi
     odin_windows_window_t* vulkan_windows_window = (odin_windows_window_t*)vulkan_window;
 
     /* Destroy the resources and swapchain. */
-    odin_vulkan_window_resources_create(vulkan_render_device, vulkan_window);
     odin_vulkan_window_swapchain_destroy(vulkan_render_device, vulkan_window);
 
     /* Destroy the surface. */
@@ -164,8 +164,16 @@ void odin_vulkan_window_destroy(odin_render_device render_device, odin_window wi
 
 }
 
+void odin_vulkan_window_get_platform_handle(odin_render_device render_device, odin_window window, void** handle)
+{
 
-void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device, odin_vulkan_window window)
+    odin_windows_window_t* windows_window = (odin_windows_window_t*)window;
+
+    *handle = windows_window->handle;
+
+}
+
+void odin_vulkan_window_swapchain_create(odin_vulkan_render_device vulkan_render_device, odin_vulkan_window window)
 {
 
     /* Get the windows window. */
@@ -174,7 +182,7 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device
 
     /* Get the surface capabilities */
     VkSurfaceCapabilitiesKHR surface_capabilities = { 0 };
-    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(render_device->physical_device, window->surface, &surface_capabilities);
+    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_render_device->physical_device, window->surface, &surface_capabilities);
 
     /* Get the min image count. */
     window->image_count = surface_capabilities.minImageCount + 1;
@@ -185,12 +193,12 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device
     
     /* Get the image format. */
     uint32_t surface_formats_count;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(render_device->physical_device, window->surface, &surface_formats_count, NULL);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_render_device->physical_device, window->surface, &surface_formats_count, NULL);
 
     VkSurfaceFormatKHR* surface_formats = malloc(sizeof(VkSurfaceFormatKHR) * surface_formats_count);
     aero_memset(surface_formats, sizeof(VkSurfaceFormatKHR) * surface_formats_count, 0);
 
-    vkGetPhysicalDeviceSurfaceFormatsKHR(render_device->physical_device, window->surface, &surface_formats_count, surface_formats);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_render_device->physical_device, window->surface, &surface_formats_count, surface_formats);
 
     bool found_surface_format = false;
     for(uint32_t i = 0; i < surface_formats_count; i++)
@@ -234,16 +242,16 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device
 
 
     /* Get the queue family indices. */
-    uint32_t queue_family_indices[] = {render_device->graphics_queue_index, render_device->present_queue_index};
+    uint32_t queue_family_indices[] = {vulkan_render_device->graphics_queue_index, vulkan_render_device->present_queue_index};
 
     /* Get the present mode. */
     uint32_t present_modes_count = 0;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(render_device->physical_device, window->surface, &present_modes_count, NULL);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(vulkan_render_device->physical_device, window->surface, &present_modes_count, NULL);
 
     VkPresentModeKHR* present_modes = malloc(sizeof(VkPresentModeKHR) * present_modes_count);
     aero_memset(present_modes, sizeof(VkPresentModeKHR) * present_modes_count, 0);
 
-    vkGetPhysicalDeviceSurfacePresentModesKHR(render_device->physical_device, window->surface, &present_modes_count, present_modes);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(vulkan_render_device->physical_device, window->surface, &present_modes_count, present_modes);
 
     bool found_present_mode = false;
 
@@ -275,19 +283,28 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device
     swapchain_create_info.imageExtent               = window->surface_extent;
     swapchain_create_info.imageArrayLayers          = 1;
     swapchain_create_info.imageUsage                = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    swapchain_create_info.imageSharingMode          = render_device->graphics_queue_index != render_device->present_queue_index ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
-    swapchain_create_info.queueFamilyIndexCount     = render_device->graphics_queue_index != render_device->present_queue_index ? 2 : 0;
-    swapchain_create_info.pQueueFamilyIndices       = render_device->graphics_queue_index != render_device->present_queue_index ? queue_family_indices : NULL;
+    swapchain_create_info.imageSharingMode          = vulkan_render_device->graphics_queue_index != vulkan_render_device->present_queue_index ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
+    swapchain_create_info.queueFamilyIndexCount     = vulkan_render_device->graphics_queue_index != vulkan_render_device->present_queue_index ? 2 : 0;
+    swapchain_create_info.pQueueFamilyIndices       = vulkan_render_device->graphics_queue_index != vulkan_render_device->present_queue_index ? queue_family_indices : NULL;
     swapchain_create_info.preTransform              = surface_capabilities.currentTransform;
     swapchain_create_info.compositeAlpha            = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     swapchain_create_info.presentMode               = window->present_mode;
     swapchain_create_info.clipped                   = VK_FALSE;
     swapchain_create_info.oldSwapchain              = NULL;
     
-    if(vkCreateSwapchainKHR(render_device->device, &swapchain_create_info, NULL, &window->swapchain) != VK_SUCCESS)
+    if(vkCreateSwapchainKHR(vulkan_render_device->device, &swapchain_create_info, NULL, &window->swapchain) != VK_SUCCESS)
     {
         ODIN_ERROR("o_vulkan_window_windows.c", "Could not create a window's swapchain!");
     }
+
+    
+    /* Get the swapchains images. */
+    vkGetSwapchainImagesKHR(vulkan_render_device->device, window->swapchain, &window->image_count, NULL);
+
+    window->images = malloc(sizeof(VkImage) * window->image_count);
+
+    vkGetSwapchainImagesKHR(vulkan_render_device->device, window->swapchain, &window->image_count, window->images);
+
 
 }
 
@@ -299,18 +316,3 @@ void odin_vulkan_window_swapchain_destroy(odin_vulkan_render_device render_devic
 
 }
 
-/** \brief Creates a windows resources like framebuffers and image views. */
-void odin_vulkan_window_resources_create(odin_vulkan_render_device render_device, odin_vulkan_window window)
-{
-
-    
-
-}
-
-/** \brief Destroys a windows framebuffers and image views. */
-void odin_vulkan_window_resources_destroy(odin_vulkan_render_device render_device, odin_vulkan_window window)
-{
-
-    
-
-}

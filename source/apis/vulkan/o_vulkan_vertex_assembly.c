@@ -64,32 +64,32 @@ void odin_vulkan_vertex_format_to_vulkan(odin_vertex_element_format element_form
             break;
 
         case odin_vertex_element_format_vec2f:
-            *element_size = sizeof(float[2]);
+            *element_size = sizeof(float) * 2;
             *format = VK_FORMAT_R32G32_SFLOAT;
             break;
         
         case odin_vertex_element_format_vec2i32:
-            *element_size = sizeof(int32_t[2]);
+            *element_size = sizeof(int32_t) * 2;
             *format = VK_FORMAT_R32G32_SINT;
             break;
 
         case odin_vertex_element_format_vec3f:
-            *element_size = sizeof(float[3]);
+            *element_size = sizeof(float) * 3;
             *format = VK_FORMAT_R32G32B32_SFLOAT;
             break;
 
         case odin_vertex_element_format_vec3i32:
-            *element_size = sizeof(int32_t[3]);
+            *element_size = sizeof(int32_t) * 3;
             *format = VK_FORMAT_R32G32B32_SINT;
             break;
 
         case odin_vertex_element_format_vec4f:
-            *element_size = sizeof(float[4]);
+            *element_size = sizeof(float) * 4;
             *format = VK_FORMAT_R32G32B32A32_SFLOAT;
             break;
         
         case odin_vertex_element_format_vec4i32:
-            *element_size = sizeof(int32_t[4]);
+            *element_size = sizeof(int32_t) * 4;
             *format = VK_FORMAT_R32G32B32A32_SINT;
             break;
         

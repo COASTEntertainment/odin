@@ -2,42 +2,55 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "aero/a_memory.h"
+#include "aero/a_string.h"
 
-void cube_draw(odin_render_device render_device, odin_draw_data draw_data, void* user_data);
+#ifdef _WIN32
 
+    #include "Windows.h"
+
+    LRESULT CALLBACK cube_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+#endif /* _WIN32 */
+
+
+void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_render_pass present_pass, odin_framebuffer framebuffer, void* user_data);
+
+void cube_handle_input_init_window(odin_render_device render_device, odin_window window);
+void cube_handle_input_window(odin_render_device render_device, odin_window window);
 
 typedef struct default_vertex
 {
 
-    float position[3];
-    float color[4];
+    float position[2];
+    float color[3];
 
 } default_vertex_t;
 
 
 static default_vertex_t verts[4] =
 {
-    {{-0.5f, -0.5f, 0.0f},  {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f},   {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f, 0.0f},   {0.0f, 0.0f, 1.0f}},
-    {{0.5f, 0.5f, 0.0f},    {1.0f, 1.0f, 1.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 };
 
-static uint32_t indices[4] =
+static uint32_t indices[6] =
 {
-    0, 1, 2, 3
+    0, 1, 2, 2, 3, 0
 };
 
 
 typedef struct cube_example_data
 {
 
-    odin_render_pass        gbuffer;
-    odin_framebuffer        gbuffer_framebuffer;
+    odin_render_device      render_device;
     odin_vertex_buffer      vertex_buffer;
     odin_index_buffer       index_buffer;
     odin_pipeline           pipeline;
@@ -59,55 +72,50 @@ int main()
     initialize_info.engine_name = "Example Engine";
     initialize_info.engine_version = (odin_version){ 0, 0, 1 };
 
-    odin_render_device render_device;
-    odin_initialize(&render_device, &initialize_info);
+
+    odin_initialize(&cube_data.render_device, &initialize_info);
 
     /* Get the monitors count. */
     int monitors_count = 0;
-    odin_get_monitors(render_device, &monitors_count, NULL);
+    odin_get_monitors(cube_data.render_device, &monitors_count, NULL);
 
     /* Create the monitors array. */
     odin_monitor* monitors = malloc(sizeof(odin_monitor) * monitors_count);
     memset(monitors, 0, sizeof(odin_monitor) * monitors_count);
 
     /* Get the monitors. */
-    odin_get_monitors(render_device, &monitors_count, monitors);
+    odin_get_monitors(cube_data.render_device, &monitors_count, monitors);
 
     int width = monitors[0]->width;
     int height = monitors[0]->height;
 
     /* Create the window. */
     odin_window window = NULL;
-    odin_window_create(render_device, &window, "Cube Example", 0, 0, monitors[0]->width / 2, monitors[0]->height / 2, odin_window_style_minimal, false, NULL);
+    odin_window_create(cube_data.render_device, &window, "Cube Example", 0, 0, monitors[0]->width / 2, monitors[0]->height / 2, odin_window_style_defalt, false, NULL);
 
     free(monitors);
 
     
     /* Get the physical devices. */
     int physical_devices_count = 0;
-    odin_get_physical_devices(render_device, &physical_devices_count, NULL);
+    odin_get_physical_devices(cube_data.render_device, &physical_devices_count, NULL);
 
     odin_physical_device* physical_devices = malloc(sizeof(odin_physical_device) * physical_devices_count);
     memset(physical_devices, 0, sizeof(odin_physical_device) * physical_devices_count);
 
-    odin_get_physical_devices(render_device, &physical_devices_count, physical_devices);
-
-    odin_set_physical_device(render_device, physical_devices[0], window);
+    odin_get_physical_devices(cube_data.render_device, &physical_devices_count, physical_devices);
+    odin_set_physical_device(cube_data.render_device, physical_devices[0], window);
     
 
     /* Describe the vertex assembly to create vertex buffers. */
     odin_vertex_assembly vertex_assembly;
-    odin_vertex_assembly_create(render_device, &vertex_assembly, 0, sizeof(default_vertex_t), 2);
+    odin_vertex_assembly_create(cube_data.render_device, &vertex_assembly, 0, sizeof(default_vertex_t), 2);
     
-    odin_vertex_assembly_describe_element(render_device, vertex_assembly, 0, odin_vertex_element_format_vec3f);
-    odin_vertex_assembly_describe_element(render_device, vertex_assembly, 1, odin_vertex_element_format_vec4f);
+    odin_vertex_assembly_describe_element(cube_data.render_device, vertex_assembly, 0, odin_vertex_element_format_vec2f);
+    odin_vertex_assembly_describe_element(cube_data.render_device, vertex_assembly, 1, odin_vertex_element_format_vec3f);
 
-
-    odin_vertex_buffer vertex_buffer;
-    odin_vertex_buffer_create(render_device, &vertex_buffer, vertex_assembly, 4, verts);
-
-    odin_index_buffer index_buffer;
-    odin_index_buffer_create(render_device, &index_buffer, 4, indices);
+    odin_vertex_buffer_create(cube_data.render_device, &cube_data.vertex_buffer, vertex_assembly, 4, verts);
+    odin_index_buffer_create(cube_data.render_device, &cube_data.index_buffer, 6, indices);
 
 
     /* Load the image using stb_image. */
@@ -117,21 +125,10 @@ int main()
     assert(texture_data);
 
     odin_image texture;
-    odin_image_create(render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 1, 3, odin_image_samples_1x);
-
-    odin_image_upload_data(render_device, texture, texture_data);
-
-
-    /* Create the render passes. */
-    odin_image color_frame;
-    odin_image_create(render_device, &color_frame, odin_image_format_rgba_8_srgb, 1080, 720, 1, 1, odin_image_samples_1x);
-
-    odin_render_pass_create(render_device, &cube_data.gbuffer, 1, &color_frame);
-
-    odin_framebuffer_create(render_device, &cube_data.gbuffer_framebuffer, 1080, 720, cube_data.gbuffer, 1, &color_frame);
+    odin_image_create(cube_data.render_device, &texture, odin_image_format_rgba_8_srgb, texture_width, texture_height, 1, 3, odin_image_samples_1x);
+    odin_image_upload_data(cube_data.render_device, texture, texture_data);
 
 
-    
     odin_shader_code simple_shader_vert_code;
     odin_shader_code simple_shader_frag_code;
 
@@ -150,64 +147,152 @@ int main()
 
     odin_shader simple_shader_vert;
     odin_shader simple_shader_frag;
+    odin_pipeline_shader_create(cube_data.render_device, &simple_shader_vert, odin_shader_stage_vertex, simple_shader_vert_code);
+    odin_pipeline_shader_create(cube_data.render_device, &simple_shader_frag, odin_shader_stage_fragment, simple_shader_frag_code);
 
-    odin_pipeline_shader_create(render_device, &simple_shader_vert, odin_shader_stage_vertex, simple_shader_vert_code);
-    odin_pipeline_shader_create(render_device, &simple_shader_frag, odin_shader_stage_fragment, simple_shader_frag_code);
+    /* WE CAN DRAW!!! */
+    odin_render_pass present_pass;
+    odin_draw_prepare_window(cube_data.render_device, window, &present_pass);
+
+    odin_pipeline_create(cube_data.render_device, &cube_data.pipeline, simple_shader_vert, simple_shader_frag, present_pass, 1, &vertex_assembly);
 
 
-    odin_pipeline simple_shader;
-    odin_pipeline_create(render_device, &simple_shader, simple_shader_vert, simple_shader_frag, cube_data.gbuffer, 1, &vertex_assembly);
 
 
-    /*
-    odin_draw_prepare(render_device);
 
+
+    int frame_count = 0;
+    clock_t previous_time = clock();
 
     while(true)
     {
-        odin_draw_frame(render_device, cube_draw);
+        /* Draw to the window. */
+        odin_draw_frame_window(cube_data.render_device, window, cube_draw, &cube_data);
+
+        /* Do input handling. */
+
+        
+
+        frame_count++;
+
+        clock_t current_time = clock();
+        
+        if(current_time - CLOCKS_PER_SEC >= previous_time)
+        {
+            char buf[32];
+            aero_memset(buf, 32, 0);
+
+
+            aero_strcat(buf, 32, "FPS: ");
+            _itoa(frame_count, buf, 10);
+            
+
+
+            ODIN_LOG("cube.c", buf);
+            fflush(NULL);
+
+            previous_time = clock();
+            frame_count = 0;
+        }
+
     }
 
-    odin_draw_done(render_device);
-    */
+    odin_draw_done_window(cube_data.render_device, window);
+    
 
 
     /* Destroy resources. */
-    odin_pipeline_destroy(render_device, simple_shader);
-
-    odin_framebuffer_destroy(render_device, cube_data.gbuffer_framebuffer);
-
-    odin_render_pass_destroy(render_device, cube_data.gbuffer);
-
-    odin_image_destroy(render_device, color_frame);
-
-    odin_image_destroy(render_device, texture);
-
-    odin_index_buffer_destroy(render_device, index_buffer);
-    odin_vertex_buffer_destroy(render_device, vertex_buffer);
-
-    odin_vertex_assembly_destroy(render_device, vertex_assembly);
+    odin_pipeline_destroy(cube_data.render_device, cube_data.pipeline);
+    odin_image_destroy(cube_data.render_device, texture);
+    odin_index_buffer_destroy(cube_data.render_device, cube_data.index_buffer);
+    odin_vertex_buffer_destroy(cube_data.render_device, cube_data.vertex_buffer);
+    odin_vertex_assembly_destroy(cube_data.render_device, vertex_assembly);
+    odin_window_destroy(cube_data.render_device, window);
 
 
-    odin_window_destroy(render_device, window);
-
-    odin_terminate(render_device);
+    odin_terminate(cube_data.render_device);
 }
 
 
-void cube_draw(odin_render_device render_device, odin_draw_data draw_data, void* user_data)
+
+void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_render_pass present_pass, odin_framebuffer present_framebuffer, void* user_data)
 {
 
     cube_example_data* draw_cube_data = (cube_example_data*)user_data;
 
-    odin_draw_command_begin_render_pass(render_device, draw_data, draw_cube_data->gbuffer, draw_cube_data->gbuffer_framebuffer);
+    odin_draw_command_begin_render_pass(render_device, draw_data, present_pass, present_framebuffer);
 
-        odin_draw_command_set_vertex_buffer(render_device, draw_data, draw_cube_data->vertex_buffer);
-        odin_draw_command_set_index_buffer(render_device, draw_data, draw_cube_data->index_buffer);
+        odin_draw_command_bind_vertex_buffer(render_device, draw_data, draw_cube_data->vertex_buffer);
+        odin_draw_command_bind_index_buffer(render_device, draw_data, draw_cube_data->index_buffer);
+        odin_draw_command_bind_pipeline(render_device, draw_data, draw_cube_data->pipeline);
+        odin_draw_command_indexed(render_device, draw_data, 6);
 
-        odin_draw_command_set_pipeline(render_device, draw_data, draw_cube_data->pipeline);
-
-    odin_draw_command_end_render_pass(render_device, draw_data, draw_cube_data->gbuffer);
+    odin_draw_command_end_render_pass(render_device, draw_data, present_pass);
 
 }
 
+void cube_handle_input(odin_render_device render_device, odin_window window)
+{
+
+    /* This function does basic window input handling on a per platform level. */
+
+    #ifdef _WIN32
+
+        HWND hwnd;
+
+        odin_window_get_platform_handle(render_device, window, &hwnd);
+
+
+
+
+
+    #endif /* _WIN32 */
+
+
+}
+
+
+#ifdef _WIN32
+
+LRESULT CALLBACK cube_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    /* Read all of the messages. */
+    switch (uMsg) 
+    { 
+
+        /* This returns the apis window, but contains the same data as an odin window so it can be used. */
+        odin_window window = GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
+        case WM_CREATE: 
+            // Initialize the window. 
+            return 0; 
+ 
+        case WM_PAINT: 
+            // Paint the window's client area. 
+            return 0; 
+ 
+        case WM_SIZE: 
+            // Set the size and position of the window. 
+            return 0; 
+ 
+        case WM_DESTROY: 
+            // Clean up window-specific data objects. 
+            return 0; 
+ 
+        case WM_CLOSE:
+            odin_draw_done_window(cube_data.render_device, window);
+            odin_window_destroy(cube_data.render_device, window);
+            return 0;
+
+        // 
+        // Process other messages. 
+        // 
+ 
+        default: 
+            return DefWindowProc(hwnd, uMsg, wParam, lParam); 
+    } 
+    return 0; 
+}
+
+
+#endif /* _WIN32 */

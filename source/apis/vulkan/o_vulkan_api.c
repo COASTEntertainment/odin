@@ -43,4 +43,15 @@ void odin_vulkan_api_load()
     odin_render_pass_create = odin_vulkan_render_pass_create;
     odin_render_pass_destroy = odin_vulkan_render_pass_destroy;
 
+    odin_draw_prepare_window = odin_vulkan_draw_prepare_window;
+    odin_draw_frame_window = odin_vulkan_draw_frame_window;
+    odin_draw_done_window = odin_vulkan_draw_done_window;
+
+    odin_draw_command_begin_render_pass = odin_vulkan_draw_command_begin_render_pass;
+    odin_draw_command_end_render_pass = odin_vulkan_draw_command_end_render_pass;
+    odin_draw_command_bind_index_buffer = odin_vulkan_draw_command_bind_index_buffer;
+    odin_draw_command_bind_vertex_buffer = odin_vulkan_draw_command_bind_vertex_buffer;
+    odin_draw_command_bind_pipeline = odin_vulkan_draw_command_bind_pipeline;
+    odin_draw_command_indexed = odin_vulkan_draw_command_indexed;
+
 }

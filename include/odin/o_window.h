@@ -42,5 +42,8 @@ void ( *odin_window_destroy)(odin_render_device render_device, odin_window windo
 /** \brief Changes the windows to be fullscreen or not. */
 void ( *odin_window_fullscreen)(odin_render_device render_device, odin_window window, bool fullscreen, odin_monitor monitor);
 
+/** \brief Gets the default window handle of the current platform. */
+void ( *odin_window_get_platform_handle)(odin_render_device render_device, odin_window window, void** handle);
+
 
 #endif /* __ODIN_WINDOW_H__ */
