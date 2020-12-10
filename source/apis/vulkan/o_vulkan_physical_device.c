@@ -220,6 +220,5 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
 
     /* Create the main windows swapchain. */
     odin_vulkan_window_swapchain_create(vulkan_render_device, vulkan_window);
-    odin_vulkan_window_resources_create(vulkan_render_device, vulkan_window);
 
 }

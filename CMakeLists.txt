@@ -18,6 +18,19 @@ list(APPEND odin_sources
     "source/o_api.c"
 )
 
+# Build the input sources
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+
+    list(APPEND odin_sources
+        "source/input/o_input_windows.c"
+    )
+
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+endif()
+
+
 # Find Third Party libraries
 
     # Find Vulkan
