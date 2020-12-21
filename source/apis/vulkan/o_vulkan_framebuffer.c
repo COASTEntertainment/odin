@@ -1,5 +1,8 @@
 #include "odin/apis/vulkan/o_vulkan_framebuffer.h"
 
+#include "aero/a_memory.h"
+
+#include "odin/o_log.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_render_pass.h"
 #include "odin/apis/vulkan/o_vulkan_image.h"
@@ -10,7 +13,6 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
 
     /* Get the vulkan objects. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
-
     odin_vulkan_render_pass vulkan_render_pass = (odin_vulkan_render_pass)render_pass;
 
     /* Allocate the framebuffer object. */
@@ -21,16 +23,13 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
 
 
     /* Get all the attachments in a vulkan pointer. */
-    VkImageView* vulkan_attachments = malloc(sizeof(VkImageView) * attachments_count);
+    VkImageView* vulkan_attachments = NEW(VkImageView, attachments_count);
 
     for(int i = 0; i < attachments_count; i++)
     {
 
-        /* Get the vulkan texture. */
-        odin_vulkan_image vulkan_texture = (odin_vulkan_image)attachments[i];
-        
-        vulkan_attachments[i] = vulkan_texture->image_view;
-
+        /* Copy the image views to the vulkan attachments. */
+        aero_memcpy(vulkan_attachments[i], sizeof(VkImageView), ((odin_vulkan_image)attachments[i])->image_view, sizeof(VkImageView));
     }
 
 
@@ -45,9 +44,12 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
     framebuffer_create_info.height = height;
     framebuffer_create_info.layers = 1;
 
-    vkCreateFramebuffer(vulkan_render_device->device, &framebuffer_create_info, NULL, &vulkan_framebuffer->framebuffer);
+    if (vkCreateFramebuffer(vulkan_render_device->device, &framebuffer_create_info, NULL, &vulkan_framebuffer->framebuffer) != VK_SUCCESS)
+    {
+        ODIN_ERROR("o_vulkan_framebuffer.c", "Could not create a framebuffer!");
+    }
 
-    free(vulkan_attachments);
+    DELETE(vulkan_attachments);
 
 }
 
@@ -56,11 +58,12 @@ void odin_vulkan_framebuffer_destroy(odin_render_device render_device, odin_fram
 
     /* Get the vulkan objects. */
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
-
     odin_vulkan_framebuffer vulkan_framebuffer = (odin_vulkan_framebuffer)framebuffer;
 
     
     vkDestroyFramebuffer(vulkan_render_device->device, vulkan_framebuffer->framebuffer, NULL);
+
+    DELETE(framebuffer);
 
 }
 

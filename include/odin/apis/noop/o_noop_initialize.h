@@ -6,7 +6,7 @@
 
 
 /** \brief NOOP and does not do anything! */
-void odin_noop_initialize(odin_render_device* render_device, odin_initialize_info* initialize_info) { render_device = NULL; };
+void odin_noop_initialize(odin_render_device* render_device, odin_render_device_create_info* initialize_info) { render_device = NULL; };
 
 /** \brief NOOP and does not do anything! */
 void odin_noop_terminate(odin_render_device render_device) { };

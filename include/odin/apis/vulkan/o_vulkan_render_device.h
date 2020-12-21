@@ -14,7 +14,7 @@ typedef struct odin_vulkan_window_t *odin_vulkan_window;
 typedef struct odin_vulkan_render_device_t
 {
 
-    odin_initialize_info initialize_info; /** \brief Information passed to the odin_initialize info. */
+    odin_render_device_create_info initialize_info; /** \brief Information passed to the odin_initialize info. */
 
     VkInstance instance; /** \brief The vulkan instance */
     VkPhysicalDevice physical_device; /** \brief The graphics card to be used. */

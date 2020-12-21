@@ -11,6 +11,16 @@
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 
 
+
+typedef struct odin_windows_window_t
+{
+
+    odin_vulkan_window_t vulkan_window;
+    odin_input_device input_device;
+    HWND handle;
+} odin_windows_window_t;
+
+
 static int temp_monitors_iterator = 0;
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
@@ -33,6 +43,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
     return true;
 }
 
+
 /** \brief Gets a systems monitors and their information. */
 void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor *monitors)
 {
@@ -47,15 +58,8 @@ void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_co
     EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)monitors);        
 }
 
-typedef struct odin_windows_window_t
-{
 
-    odin_vulkan_window_t vulkan_window;
-    HWND handle;
-
-} odin_windows_window_t;
-
-void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor)
+void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, odin_input_device input_device, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor)
 {
 
     /* Get the vulkan render device */
@@ -67,7 +71,7 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
     switch (style)
     {
     case odin_window_style_defalt:
-        window_style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+        window_style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME;
         break;
     
     case odin_window_style_minimal:
@@ -88,39 +92,36 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
     /* Get the vulkan window instance. */
     odin_vulkan_window vulkan_window = (odin_vulkan_window)vulkan_windows_window;
 
+    vulkan_windows_window->input_device = input_device;
+
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
     vulkan_windows_window->handle = CreateWindowEx(
-        0,                                              // Optional window styles.
+        0L,
         "ODIN_VULKAN_WINDOW_CLASS",                     // Window class
         title,                                          // Window text
-        WS_OVERLAPPEDWINDOW,                            // Window style
+        window_style,                            // Window style
 
                                 
-        CW_USEDEFAULT, CW_USEDEFAULT, width, height,    // Size and position
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,    // Size and position
 
         NULL,                                           // Parent window    
         NULL,                                           // Menu
         hInstance,                                      // Instance handle
-        NULL                                            // Additional application data
+        (LPVOID)vulkan_windows_window                           // Additional application data
         );
 
-    SetWindowLongPtr(vulkan_windows_window->handle, GWLP_USERDATA, vulkan_windows_window);
-
-
-    /* Make sure the style is correct. */
-    switch (style)
-    {
     
-    case odin_window_style_minimal:
-        SetWindowLong(vulkan_windows_window->handle, GWL_STYLE, 0); //remove all window styles, check MSDN for details
-        break;
 
-    default:
-        break;
+    if(!vulkan_windows_window->handle)
+    {
+        ODIN_ERROR("o_vulkan_window_windows.c", "Could not create the windows window!");
     }
 
+    SetWindowLongPtr(vulkan_windows_window->handle, GWLP_USERDATA, (LONG_PTR)vulkan_windows_window);
+
     ShowWindow(vulkan_windows_window->handle, SW_SHOW);
+    UpdateWindow(vulkan_windows_window->handle);
 
 
     /* Create the vulkan window surface. */
@@ -142,8 +143,8 @@ void odin_vulkan_window_create(odin_render_device render_device, odin_window* wi
     {
         odin_vulkan_window_swapchain_create(vulkan_render_device, vulkan_window);
     }
-
 }
+
 
 void odin_vulkan_window_destroy(odin_render_device render_device, odin_window window)
 {
@@ -161,17 +162,17 @@ void odin_vulkan_window_destroy(odin_render_device render_device, odin_window wi
 
     /* Destroy the windows window. */
     DestroyWindow(vulkan_windows_window->handle);
-
 }
 
-void odin_vulkan_window_get_platform_handle(odin_render_device render_device, odin_window window, void** handle)
+
+void odin_vulkan_window_get_input_device(odin_window window, odin_input_device* input_device)
 {
 
     odin_windows_window_t* windows_window = (odin_windows_window_t*)window;
 
-    *handle = windows_window->handle;
-
+    *input_device = windows_window->input_device;
 }
+
 
 void odin_vulkan_window_swapchain_create(odin_vulkan_render_device vulkan_render_device, odin_vulkan_window window)
 {
@@ -304,15 +305,12 @@ void odin_vulkan_window_swapchain_create(odin_vulkan_render_device vulkan_render
     window->images = malloc(sizeof(VkImage) * window->image_count);
 
     vkGetSwapchainImagesKHR(vulkan_render_device->device, window->swapchain, &window->image_count, window->images);
-
-
 }
+
 
 void odin_vulkan_window_swapchain_destroy(odin_vulkan_render_device render_device, odin_vulkan_window window)
 {
 
-    /* Destroy the swapchain. */
     vkDestroySwapchainKHR(render_device->device, window->swapchain, NULL);
-
 }
 

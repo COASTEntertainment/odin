@@ -10,39 +10,33 @@
 #include "aero/a_memory.h"
 #include "aero/a_string.h"
 
-#ifdef _WIN32
 
-    #include "Windows.h"
-
-    LRESULT CALLBACK cube_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-#endif /* _WIN32 */
-
+void window_processor(odin_window window, odin_event event, odin_event_window_data_t window_data);
 
 void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_render_pass present_pass, odin_framebuffer framebuffer, void* user_data);
 
-void cube_handle_input_init_window(odin_render_device render_device, odin_window window);
-void cube_handle_input_window(odin_render_device render_device, odin_window window);
 
 typedef struct default_vertex
 {
 
     float position[2];
     float color[3];
-
 } default_vertex_t;
 
 
 static default_vertex_t verts[4] =
 {
+
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
     {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
     {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
     {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 };
 
+
 static uint32_t indices[6] =
 {
+
     0, 1, 2, 2, 3, 0
 };
 
@@ -54,7 +48,6 @@ typedef struct cube_example_data
     odin_vertex_buffer      vertex_buffer;
     odin_index_buffer       index_buffer;
     odin_pipeline           pipeline;
-
 } cube_example_data;
 
 cube_example_data cube_data = { 0 };
@@ -63,17 +56,22 @@ cube_example_data cube_data = { 0 };
 int main()
 {
 
+    odin_input_device input_device;
+    odin_input_device_create(&input_device);
+
+    odin_input_device_set_window_processor(input_device, window_processor);
+
     odin_api choosen_api = odin_api_vulkan;
     odin_load_api(choosen_api);
 
-    odin_initialize_info initialize_info = { 0 };
+    odin_render_device_create_info initialize_info = { 0 };
     initialize_info.application_name = "Cube Example";
     initialize_info.application_version = (odin_version){ 0, 0, 1 };
     initialize_info.engine_name = "Example Engine";
     initialize_info.engine_version = (odin_version){ 0, 0, 1 };
 
 
-    odin_initialize(&cube_data.render_device, &initialize_info);
+    odin_render_device_create(&cube_data.render_device, &initialize_info);
 
     /* Get the monitors count. */
     int monitors_count = 0;
@@ -91,11 +89,18 @@ int main()
 
     /* Create the window. */
     odin_window window = NULL;
-    odin_window_create(cube_data.render_device, &window, "Cube Example", 0, 0, monitors[0]->width / 2, monitors[0]->height / 2, odin_window_style_defalt, false, NULL);
+    odin_window_create(
+        cube_data.render_device, 
+        &window, input_device, 
+        "Cube Example", 
+        0, 0, monitors[0]->width / 2, monitors[0]->height / 2, 
+        odin_window_style_defalt, 
+        false, 
+        NULL);
 
     free(monitors);
 
-    
+                          
     /* Get the physical devices. */
     int physical_devices_count = 0;
     odin_get_physical_devices(cube_data.render_device, &physical_devices_count, NULL);
@@ -166,10 +171,13 @@ int main()
 
     while(true)
     {
+        /* Do input handling. */
+        odin_input_poll(input_device);
+
         /* Draw to the window. */
         odin_draw_frame_window(cube_data.render_device, window, cube_draw, &cube_data);
 
-        /* Do input handling. */
+
 
         
 
@@ -210,9 +218,19 @@ int main()
     odin_window_destroy(cube_data.render_device, window);
 
 
-    odin_terminate(cube_data.render_device);
+    odin_render_device_destroy(cube_data.render_device);
+
+
+    odin_input_device_destroy(input_device);
 }
 
+
+void window_processor(odin_window window, odin_event event, odin_event_window_data_t window_data)
+{
+
+    
+
+}
 
 
 void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_render_pass present_pass, odin_framebuffer present_framebuffer, void* user_data)
@@ -230,69 +248,3 @@ void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_
     odin_draw_command_end_render_pass(render_device, draw_data, present_pass);
 
 }
-
-void cube_handle_input(odin_render_device render_device, odin_window window)
-{
-
-    /* This function does basic window input handling on a per platform level. */
-
-    #ifdef _WIN32
-
-        HWND hwnd;
-
-        odin_window_get_platform_handle(render_device, window, &hwnd);
-
-
-
-
-
-    #endif /* _WIN32 */
-
-
-}
-
-
-#ifdef _WIN32
-
-LRESULT CALLBACK cube_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    /* Read all of the messages. */
-    switch (uMsg) 
-    { 
-
-        /* This returns the apis window, but contains the same data as an odin window so it can be used. */
-        odin_window window = GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
-        case WM_CREATE: 
-            // Initialize the window. 
-            return 0; 
- 
-        case WM_PAINT: 
-            // Paint the window's client area. 
-            return 0; 
- 
-        case WM_SIZE: 
-            // Set the size and position of the window. 
-            return 0; 
- 
-        case WM_DESTROY: 
-            // Clean up window-specific data objects. 
-            return 0; 
- 
-        case WM_CLOSE:
-            odin_draw_done_window(cube_data.render_device, window);
-            odin_window_destroy(cube_data.render_device, window);
-            return 0;
-
-        // 
-        // Process other messages. 
-        // 
- 
-        default: 
-            return DefWindowProc(hwnd, uMsg, wParam, lParam); 
-    } 
-    return 0; 
-}
-
-
-#endif /* _WIN32 */

@@ -12,7 +12,7 @@ typedef struct odin_version
 
 } odin_version;
 
-typedef struct odin_initialize_info
+typedef struct odin_render_device_create_info
 {
 
     const char* application_name; /** \brief The name of the application/main window. */
@@ -20,14 +20,14 @@ typedef struct odin_initialize_info
     const char* engine_name; /** \brief The name of the engine. */
     odin_version engine_version; /** \brief The version of the engine. */
 
-} odin_initialize_info;
+} odin_render_device_create_info;
 
 
 /** \brief Initializes the odin_data structure and creates any Render API calls that are required. */
-void (* odin_initialize)(odin_render_device* render_device, odin_initialize_info* initialize_info);
+void (* odin_render_device_create)(odin_render_device* render_device, odin_render_device_create_info* initialize_info);
 
 /** \brief Stops all Render API resources and frees any required memory. */
-void (* odin_terminate)(odin_render_device render_device);
+void (* odin_render_device_destroy)(odin_render_device render_device);
 
 
 #endif /* __ODIN_INITIALIZE_H__ */

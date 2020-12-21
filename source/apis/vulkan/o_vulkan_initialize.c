@@ -15,7 +15,7 @@
 /* The debug callback for vulkan. */
 VkBool32 odin_vulkan_debug_utils_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
-void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_info* initialize_info)
+void odin_vulkan_initialize(odin_render_device *render_device, odin_render_device_create_info* initialize_info)
 {
 
     /* Create the render device. */
@@ -24,7 +24,7 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
 
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)*render_device;
     
-    aero_memcpy(&vulkan_render_device->initialize_info, sizeof(odin_initialize_info), initialize_info, sizeof(odin_initialize_info));
+    aero_memcpy(&vulkan_render_device->initialize_info, sizeof(odin_render_device_create_info), initialize_info, sizeof(odin_render_device_create_info));
 
     VkApplicationInfo application_info = { 0 };
     application_info.sType                  = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -59,7 +59,7 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
             const char* layer_name = layer_properties[i].layerName;
 
             bool indicator = false;
-            aero_strcmp(layer_name, 256, validation_layers[j], &indicator);
+            //aero_strcmp(layer_name, 256, validation_layers[j], &indicator);
             
             if(!indicator)
             {
@@ -72,7 +72,7 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_initialize_i
     /* Somethings wrong with finding validation layers! */
     if(validation_layers_found_count != validation_layers_count)
     {
-        ODIN_ERROR("o_vulkan_initialize.c", "Could not find specified Vulkan validation layers!");
+ //       ODIN_ERROR("o_vulkan_initialize.c", "Could not find specified Vulkan validation layers!");
     }
 
     /* Get the instance extensions. */
@@ -136,8 +136,7 @@ void odin_vulkan_terminate(odin_render_device render_device)
 
 
     /* Clear all render device memory. */
-    free(render_device);
-    render_device = NULL;
+    DELETE(vulkan_render_device);
 }
 
 VkBool32 odin_vulkan_debug_utils_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)

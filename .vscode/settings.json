@@ -5,6 +5,7 @@
         "xiosbase": "cpp",
         "vector": "cpp",
         "xstring": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "exception": "c"
     }
 }

@@ -14,7 +14,7 @@ void odin_vulkan_index_buffer_create(odin_render_device render_device, odin_inde
 
 
     /* Allocate the vulkan vertex buffer object. */
-    odin_vulkan_index_buffer vulkan_index_buffer = malloc(sizeof(odin_vulkan_index_buffer_t));
+    odin_vulkan_index_buffer vulkan_index_buffer = NEW(odin_vulkan_index_buffer_t, 1);
     *index_buffer = (odin_index_buffer)vulkan_index_buffer;    
 
 
@@ -68,7 +68,10 @@ void odin_vulkan_index_buffer_create(odin_render_device render_device, odin_inde
 
     VmaAllocationInfo allocation_info = { 0 };
 
-    vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &vulkan_index_buffer->buffer, &vulkan_index_buffer->allocation, &allocation_info);
+    if (vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &vulkan_index_buffer->buffer, &vulkan_index_buffer->allocation, &allocation_info) != VK_SUCCESS)
+    {
+        ODIN_ERROR("o_vulkan_index_buffer.c", "Could not create a vulkan index buffer!");
+    }
 
 
     /* Transfer the data to the staging buffer. */
@@ -146,5 +149,7 @@ void odin_vulkan_index_buffer_destroy(odin_render_device render_device, odin_ind
 
     /* Destroy the buffer. */
     vmaDestroyBuffer(vulkan_render_device->memory_allocator, vulkan_index_buffer->buffer, vulkan_index_buffer->allocation);
+
+    DELETE(index_buffer);
 
 }

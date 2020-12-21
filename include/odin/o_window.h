@@ -7,8 +7,11 @@
 #include "odin/o_render_device.h"
 
 
+/* Forward Dec */
+typedef struct odin_input_device *odin_input_device;
+
 /** \brief A interface for an API that can use a windowing system. */
-typedef struct odin_window_t *odin_window;
+typedef struct odin_window *odin_window;
 
 /** \brief How a window is supposed to act in an operating system */
 typedef enum odin_window_style
@@ -34,7 +37,7 @@ typedef struct odin_monitor_t
 void ( *odin_get_monitors)(odin_render_device render_device, int *monitors_count, odin_monitor *monitors);
 
 /** \brief Creates a window for rendering to. */
-void ( *odin_window_create)(odin_render_device render_device, odin_window *window, const char *title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);
+void ( *odin_window_create)(odin_render_device render_device, odin_window *window, odin_input_device input_device, const char *title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);
 
 /** \brief Destroys a window. */
 void ( *odin_window_destroy)(odin_render_device render_device, odin_window window);
@@ -42,8 +45,8 @@ void ( *odin_window_destroy)(odin_render_device render_device, odin_window windo
 /** \brief Changes the windows to be fullscreen or not. */
 void ( *odin_window_fullscreen)(odin_render_device render_device, odin_window window, bool fullscreen, odin_monitor monitor);
 
-/** \brief Gets the default window handle of the current platform. */
-void ( *odin_window_get_platform_handle)(odin_render_device render_device, odin_window window, void** handle);
+/** \brief Retrieves the input_device pointer from the window. */
+void ( *odin_window_get_input_device)(odin_window window, odin_input_device* input_device);
 
 
 #endif /* __ODIN_WINDOW_H__ */

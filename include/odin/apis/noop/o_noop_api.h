@@ -10,8 +10,8 @@
 void odin_noop_api_load()
 {
 
-    odin_initialize = odin_noop_initialize;
-    odin_terminate = odin_noop_terminate;
+    //odin_initialize = odin_noop_initialize;
+    //odin_terminate = odin_noop_terminate;
 
     
 

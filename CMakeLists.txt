@@ -24,6 +24,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     list(APPEND odin_sources
         "source/input/o_input_windows.c"
+        "source/platform/o_platform_windows.c"
     )
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

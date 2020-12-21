@@ -2,8 +2,10 @@
 #define __ODIN_INPUT_H__
 
 
-#include "o_window.h"
+#include <stdbool.h>
 
+/* Forward Dec */
+typedef struct odin_window *odin_window;
 
 /** Information about input and devices, like a render device. */
 typedef struct odin_input_device *odin_input_device;
@@ -16,7 +18,8 @@ typedef enum odin_event_type
     odin_event_type_window = 0x000,
     odin_event_type_keyboard = 0x001,
     odin_event_type_mouse = 0x002,
-    odin_event_type_gamepad = 0x003
+    odin_event_type_gamepad = 0x003, /* TODO */
+    odin_event_type_vr = 0x004  /* TODO */
 
 } odin_event_type;
 
@@ -207,7 +210,7 @@ typedef struct odin_event_window_data
     int height;
     bool focused;
 
-} *odin_event_window_data;
+} odin_event_window_data_t, *odin_event_window_data;
 
 typedef struct odin_event_keyboard_data
 {
@@ -215,7 +218,7 @@ typedef struct odin_event_keyboard_data
     odin_button_state key_state;
     odin_keyboard_modifier modifier_flags;
 
-} *odin_event_keyboard_data;
+} odin_event_keyboard_data_t,  *odin_event_keyboard_data;
 
 typedef struct odin_event_mouse_data
 {
@@ -223,7 +226,7 @@ typedef struct odin_event_mouse_data
     int delta_x;
     int delta_y;
 
-} *odin_event_mouse_data;
+} odin_event_mouse_data_t,  *odin_event_mouse_data;
 
 typedef struct odin_event_gamepad_data
 {
@@ -234,20 +237,9 @@ typedef struct odin_event_gamepad_data
 
 
 /* This should only be used internally. */
-typedef void ( *odin_input_events_processor)(odin_window window, odin_event event, void* event_data);
-
-/** \brief Process window events. */
-typedef void ( *odin_input_window_events_processor)(odin_window window, odin_event event, odin_event_window_data event_data); 
-
-/** \brief Process keyboard events. */
-typedef void ( *odin_input_keyboard_events_processor)(odin_window window, odin_event event, odin_event_keyboard_data event_data); 
-
-/** \brief Process mouse events. */
-typedef void ( *odin_input_mouse_events_processor)(odin_window window, odin_event event, odin_event_mouse_data event_data); 
-
-/** \brief Process gamepad events. */
-typedef void ( *odin_input_gamepad_events_processor)(odin_window window, odin_event event, odin_event_gamepad_data event_data); 
-
+typedef void ( *odin_input_window_events_processor)(odin_window window, odin_event event, odin_event_window_data_t window_data);
+typedef void ( *odin_input_keyboard_events_processor)(odin_window window, odin_event event, odin_event_keyboard_data_t keyboard_data);
+typedef void ( *odin_input_mouse_events_processor)(odin_window window, odin_event event, odin_event_mouse_data_t mouse_data);
 
 
 
@@ -257,8 +249,16 @@ void odin_input_device_create(odin_input_device* input_device);
 /** \brief Destroys an input device. */
 void odin_input_device_destroy(odin_input_device input_device);
 
-/* Sets an input devices procssors. */
-void odin_input_device_set_processor(odin_input_device input_device, odin_event_type type, odin_input_events_processor events_processor);
+
+
+void odin_input_device_set_window_processor (odin_input_device input_device, odin_input_window_events_processor window_processor);
+void odin_input_device_set_keyboard_processor(odin_input_device input_device, odin_input_keyboard_events_processor keyboard_processor);
+void odin_input_device_set_mouse_processor(odin_input_device input_device, odin_input_mouse_events_processor mouse_processor);
+
+
+/** \brief Polls the information from the windows. */
+void odin_input_poll();
+
 
 
 #endif /* __ODIN_INPUT_H__ */

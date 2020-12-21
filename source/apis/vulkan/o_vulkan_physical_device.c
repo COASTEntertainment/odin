@@ -39,10 +39,7 @@ void odin_vulkan_get_physical_devices(odin_render_device render_device, int *phy
 
 
     /* Create the odin array of physical_devices. */
-    for(uint32_t i = 0; i < vulkan_physical_devices_count; i++)
-    {
-        physical_devices[i] = (odin_physical_device)vulkan_physical_devices[i];
-    }
+    aero_memcpy(physical_devices, sizeof(odin_physical_device), (odin_physical_device)vulkan_physical_devices, sizeof(odin_physical_device));
 
 
 }

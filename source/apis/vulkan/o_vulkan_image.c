@@ -115,7 +115,7 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
     /* Allocate the render device. */
-    odin_vulkan_image vulkan_image = malloc(sizeof(odin_vulkan_render_device_t));
+    odin_vulkan_image vulkan_image = NEW(odin_vulkan_render_device_t, 1);
     *image = (odin_image)vulkan_image;
 
     /* Check the image create info limits. */
@@ -150,9 +150,8 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
     vulkan_image->o_depth       = depth;
     vulkan_image->o_format      = format;
     vulkan_image->o_mip_levels  = mip_levels;
-
-    vulkan_image->format    = vulkan_formats[format];
-    vulkan_image->samples   = vulkan_samples[samples];
+    vulkan_image->format        = vulkan_formats[format];
+    vulkan_image->samples       = vulkan_samples[samples];
 
     
     VkImageType image_type = VK_IMAGE_TYPE_2D;
@@ -263,7 +262,10 @@ void odin_vulkan_image_upload_data(odin_render_device render_device, odin_image 
     VmaAllocationInfo allocation_info = { 0 };
 
 
-    VkResult res =  vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &staging_buffer, &staging_buffer_allocation, &allocation_info);
+    if (vmaCreateBuffer(vulkan_render_device->memory_allocator, &buffer_create_info, &allocation_create_info, &staging_buffer, &staging_buffer_allocation, &allocation_info) != VK_SUCCESS)
+    {
+        ODIN_ERROR("o_vulkan_image.c", "Could not create an image buffer!");
+    }
 
 
     /* Copy the image data to the buffer. */
@@ -440,7 +442,5 @@ void odin_vulkan_image_destroy(odin_render_device render_device, odin_image imag
 
     vmaDestroyImage(vulkan_render_device->memory_allocator, vulkan_image->image, vulkan_image->image_allocation);
 
-    free(vulkan_image);
-    vulkan_image = NULL;
-
+    DELETE(vulkan_image);
 }

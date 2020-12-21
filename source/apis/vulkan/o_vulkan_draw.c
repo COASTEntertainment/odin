@@ -1,5 +1,9 @@
 #include "odin/apis/vulkan/o_vulkan_draw.h"
 
+#include "aero/a_memory.h"
+
+#include "odin/o_log.h"
+
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_window.h"
 #include "odin/apis/vulkan/o_vulkan_draw_data.h"
@@ -19,19 +23,14 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
 {
 
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
-    
     odin_vulkan_window vulkan_window = (odin_vulkan_window)window;
 
 
-
-
     /* Create the semaphores and fences. */
-    vulkan_window->image_available_semaphores = malloc(sizeof(VkSemaphore) * MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->render_complete_semaphores = malloc(sizeof(VkSemaphore) * MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->in_flight_fences = malloc(sizeof(VkFence) * MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->images_in_flight = malloc(sizeof(VkFence) * vulkan_window->image_count);
-
-    
+    vulkan_window->image_available_semaphores =     NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->render_complete_semaphores =     NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->in_flight_fences =               NEW(VkFence, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->images_in_flight =               NEW(VkFence, vulkan_window->image_count);
 
     VkSemaphoreCreateInfo semaphore_create_info = { 0 };
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -50,12 +49,11 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
         vkCreateFence(vulkan_render_device->device, &fence_create_info, NULL, &vulkan_window->in_flight_fences[i]);
     }
 
-    for(int i = 0; i < vulkan_window->image_count; i++)
-        vulkan_window->images_in_flight[i] = VK_NULL_HANDLE;
+    aero_memset(vulkan_window->images_in_flight, sizeof(VkFence) * vulkan_window->image_count, 0);
 
 
     /* Create the command buffers. */   
-    vulkan_window->command_buffers = malloc(sizeof(VkCommandBuffer) * vulkan_window->image_count);
+    vulkan_window->command_buffers = NEW(VkCommandBuffer, vulkan_window->image_count);
 
     VkCommandBufferAllocateInfo command_buffer_allocate_info = { 0 };
     command_buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -67,7 +65,7 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
     vkAllocateCommandBuffers(vulkan_render_device->device, &command_buffer_allocate_info, vulkan_window->command_buffers);
 
     /* Create the present render pass. */
-    odin_vulkan_render_pass present_pass_ = malloc(sizeof(odin_vulkan_render_pass));
+    odin_vulkan_render_pass present_pass_ = NEW(odin_vulkan_render_pass, 1);
     vulkan_window->present_pass = present_pass_; 
 
     VkAttachmentDescription attachment_description = { 0 };
@@ -117,18 +115,23 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
     render_pass_create_info.dependencyCount = 1;
     render_pass_create_info.pDependencies = &dependency;
 
-    vkCreateRenderPass(vulkan_render_device->device, &render_pass_create_info, NULL, &vulkan_window->present_pass->render_pass);
+    if (vkCreateRenderPass(vulkan_render_device->device, &render_pass_create_info, NULL, &vulkan_window->present_pass->render_pass) != VK_SUCCESS)
+    {
+        ODIN_ERROR("o_vulkan_draw.c", "Could not create a render pass!");
+    }
 
     
     present_pass_->render_pass = vulkan_window->present_pass->render_pass;
 
+    *present_pass = (odin_render_pass)present_pass_;
 
-    vulkan_window->image_views = malloc(sizeof(VkImageView) * vulkan_window->image_count);
-    vulkan_window->image_framebuffers = malloc(sizeof(VkFramebuffer) * vulkan_window->image_count);
+
+    /* Create the framebuffers and image views. */
+    vulkan_window->image_views =            NEW(VkImageView, vulkan_window->image_count);
+    vulkan_window->image_framebuffers =     NEW(VkFramebuffer, vulkan_window->image_count);
 
     for(int i = 0; i < vulkan_window->image_count; i++)
     {
-        
         
         VkImageViewCreateInfo image_view_create_info = { 0 };
         image_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -163,13 +166,7 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
         framebuffer_create_info.layers = 1;
 
         vkCreateFramebuffer(vulkan_render_device->device, &framebuffer_create_info, NULL, &vulkan_window->image_framebuffers[i]);
-
     }
-
-
-
-    *present_pass = (odin_render_pass)present_pass_;
-
 }
 
 static int current_frame = 0;

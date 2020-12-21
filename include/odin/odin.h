@@ -3,6 +3,9 @@
 
 
 #include "o_log.h"
+
+#include "o_input.h"
+
 #include "o_api.h"
 #include "o_render_device.h"
 #include "o_initialize.h"

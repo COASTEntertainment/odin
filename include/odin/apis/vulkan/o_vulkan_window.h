@@ -38,13 +38,13 @@ typedef struct odin_vulkan_window_t
 
 void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor *monitors);
 
-void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);
+void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, odin_input_device input_device, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);
 
 void odin_vulkan_window_destroy(odin_render_device render_device, odin_window window);
 
 void odin_vulkan_window_fullscreen(odin_render_device render_device, odin_window window, bool fullscreen);
 
-void odin_vulkan_window_get_platform_handle(odin_render_device render_device, odin_window window, void** handle);
+void odin_vulkan_window_get_input_device(odin_window window, odin_input_device* input_device);
 
 
 /** \brief Creates a swapchain for a window. */

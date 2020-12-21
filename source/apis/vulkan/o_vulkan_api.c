@@ -7,12 +7,13 @@
 void odin_vulkan_api_load()
 {
 
-    odin_initialize = odin_vulkan_initialize;
-    odin_terminate = odin_vulkan_terminate;
+    odin_render_device_create = odin_vulkan_initialize;
+    odin_render_device_destroy = odin_vulkan_terminate;
 
     odin_get_monitors = odin_vulkan_get_monitors;
     odin_window_create = odin_vulkan_window_create;
     odin_window_destroy = odin_vulkan_window_destroy;
+    odin_window_get_input_device = odin_vulkan_window_get_input_device;
 
     odin_get_physical_devices = odin_vulkan_get_physical_devices;
     odin_get_physical_device_properties = odin_vulkan_get_physical_device_properties;
