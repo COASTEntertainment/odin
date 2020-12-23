@@ -14,7 +14,7 @@ void odin_vulkan_index_buffer_create(odin_render_device render_device, odin_inde
 
 
     /* Allocate the vulkan vertex buffer object. */
-    odin_vulkan_index_buffer vulkan_index_buffer = NEW(odin_vulkan_index_buffer_t, 1);
+    odin_vulkan_index_buffer vulkan_index_buffer = AERO_NEW(odin_vulkan_index_buffer_t, 1);
     *index_buffer = (odin_index_buffer)vulkan_index_buffer;    
 
 
@@ -150,6 +150,6 @@ void odin_vulkan_index_buffer_destroy(odin_render_device render_device, odin_ind
     /* Destroy the buffer. */
     vmaDestroyBuffer(vulkan_render_device->memory_allocator, vulkan_index_buffer->buffer, vulkan_index_buffer->allocation);
 
-    DELETE(index_buffer);
+    AERO_DELETE(index_buffer);
 
 }

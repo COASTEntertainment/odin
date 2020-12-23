@@ -194,7 +194,7 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     rasterization_state.pNext                       = NULL;
     rasterization_state.flags                       = 0;
     rasterization_state.depthBiasEnable             = VK_FALSE;
-    rasterization_state.rasterizerDiscardEnable     = VK_TRUE;
+    rasterization_state.rasterizerDiscardEnable     = VK_FALSE;
     rasterization_state.polygonMode                 = VK_POLYGON_MODE_FILL;
     rasterization_state.cullMode                    = VK_CULL_MODE_BACK_BIT;
     rasterization_state.frontFace                   = VK_FRONT_FACE_CLOCKWISE;
@@ -233,6 +233,9 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     depth_stencil_state.minDepthBounds          = 0.0f;
     depth_stencil_state.maxDepthBounds          = 0.0f;
 
+    VkPipelineColorBlendAttachmentState color_blend_attachment = { 0 };
+    color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    color_blend_attachment.blendEnable = VK_FALSE;
 
     /* Create the color blend state. */
     VkPipelineColorBlendStateCreateInfo color_blend_state = { 0 };
@@ -240,13 +243,13 @@ void odin_vulkan_pipeline_create(odin_render_device render_device, odin_pipeline
     color_blend_state.pNext                 = NULL;
     color_blend_state.flags                 = 0;
     color_blend_state.logicOpEnable         = VK_FALSE;
-    color_blend_state.logicOp               = VK_LOGIC_OP_CLEAR;
-    color_blend_state.attachmentCount       = 0;
-    color_blend_state.pAttachments          = NULL;
-    color_blend_state.blendConstants[0]     = 1.0f;
-    color_blend_state.blendConstants[1]     = 1.0f;
-    color_blend_state.blendConstants[2]     = 1.0f;
-    color_blend_state.blendConstants[3]     = 1.0f;
+    color_blend_state.logicOp               = VK_LOGIC_OP_COPY;
+    color_blend_state.attachmentCount       = 1;
+    color_blend_state.pAttachments          = &color_blend_attachment;
+    color_blend_state.blendConstants[0]     = 0.0f;
+    color_blend_state.blendConstants[1]     = 0.0f;
+    color_blend_state.blendConstants[2]     = 0.0f;
+    color_blend_state.blendConstants[3]     = 0.0f;
     
     /* Create the dynamic state. */
     VkDynamicState dynamic_states[] =

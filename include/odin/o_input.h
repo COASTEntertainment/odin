@@ -237,9 +237,9 @@ typedef struct odin_event_gamepad_data
 
 
 /* This should only be used internally. */
-typedef void ( *odin_input_window_events_processor)(odin_window window, odin_event event, odin_event_window_data_t window_data);
-typedef void ( *odin_input_keyboard_events_processor)(odin_window window, odin_event event, odin_event_keyboard_data_t keyboard_data);
-typedef void ( *odin_input_mouse_events_processor)(odin_window window, odin_event event, odin_event_mouse_data_t mouse_data);
+typedef void ( *odin_input_window_events_processor)     (odin_window window, odin_event event, odin_event_window_data window_data);
+typedef void ( *odin_input_keyboard_events_processor)   (odin_window window, odin_event event, odin_event_keyboard_data keyboard_data);
+typedef void ( *odin_input_mouse_events_processor)      (odin_window window, odin_event event, odin_event_mouse_data mouse_data);
 
 
 

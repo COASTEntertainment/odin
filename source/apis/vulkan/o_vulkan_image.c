@@ -115,7 +115,7 @@ void odin_vulkan_image_create(odin_render_device render_device, odin_image* imag
     odin_vulkan_render_device vulkan_render_device = (odin_vulkan_render_device)render_device;
 
     /* Allocate the render device. */
-    odin_vulkan_image vulkan_image = NEW(odin_vulkan_render_device_t, 1);
+    odin_vulkan_image vulkan_image = AERO_NEW(odin_vulkan_render_device_t, 1);
     *image = (odin_image)vulkan_image;
 
     /* Check the image create info limits. */
@@ -442,5 +442,5 @@ void odin_vulkan_image_destroy(odin_render_device render_device, odin_image imag
 
     vmaDestroyImage(vulkan_render_device->memory_allocator, vulkan_image->image, vulkan_image->image_allocation);
 
-    DELETE(vulkan_image);
+    AERO_DELETE(vulkan_image);
 }

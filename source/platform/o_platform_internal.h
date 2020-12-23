@@ -1,8 +1,0 @@
-#ifndef __ODIN_PLATFORM_INTERNAL_H__
-#define __ODIN_PLATFORM_INTERNAL_H__
-
-
-
-
-
-#endif /* __ODIN_PLATFORM_INTERNAL_H__ */

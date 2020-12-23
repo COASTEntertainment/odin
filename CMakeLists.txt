@@ -42,6 +42,7 @@ endif()
         # Add Vulkan API Sources
         list(APPEND odin_sources
             "source/apis/vulkan/o_vulkan_api.c"
+            "source/apis/vulkan/o_vulkan_window.c"
             "source/apis/vulkan/o_vulkan_initialize.c"
             "source/apis/vulkan/o_vulkan_vma.cpp"
             "source/apis/vulkan/o_vulkan_physical_device.c"
@@ -53,6 +54,7 @@ endif()
             "source/apis/vulkan/o_vulkan_image.c"
             "source/apis/vulkan/o_vulkan_framebuffer.c"
             "source/apis/vulkan/o_vulkan_draw.c"
+            
         )
 
         # Add vulkan platform specific sources
@@ -60,7 +62,6 @@ endif()
 
             list(APPEND odin_sources
                 "source/apis/vulkan/platforms/o_vulkan_platform_windows.c"
-                "source/apis/vulkan/o_vulkan_window_windows.c"
             )
 
         elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

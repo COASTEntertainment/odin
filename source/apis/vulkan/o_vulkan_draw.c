@@ -27,10 +27,10 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
 
 
     /* Create the semaphores and fences. */
-    vulkan_window->image_available_semaphores =     NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->render_complete_semaphores =     NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->in_flight_fences =               NEW(VkFence, MAX_FRAMES_IN_FLIGHT);
-    vulkan_window->images_in_flight =               NEW(VkFence, vulkan_window->image_count);
+    vulkan_window->image_available_semaphores =     AERO_NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->render_complete_semaphores =     AERO_NEW(VkSemaphore, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->in_flight_fences =               AERO_NEW(VkFence, MAX_FRAMES_IN_FLIGHT);
+    vulkan_window->images_in_flight =               AERO_NEW(VkFence, vulkan_window->image_count);
 
     VkSemaphoreCreateInfo semaphore_create_info = { 0 };
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -53,7 +53,7 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
 
 
     /* Create the command buffers. */   
-    vulkan_window->command_buffers = NEW(VkCommandBuffer, vulkan_window->image_count);
+    vulkan_window->command_buffers = AERO_NEW(VkCommandBuffer, vulkan_window->image_count);
 
     VkCommandBufferAllocateInfo command_buffer_allocate_info = { 0 };
     command_buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -65,7 +65,7 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
     vkAllocateCommandBuffers(vulkan_render_device->device, &command_buffer_allocate_info, vulkan_window->command_buffers);
 
     /* Create the present render pass. */
-    odin_vulkan_render_pass present_pass_ = NEW(odin_vulkan_render_pass, 1);
+    odin_vulkan_render_pass present_pass_ = AERO_NEW(odin_vulkan_render_pass, 1);
     vulkan_window->present_pass = present_pass_; 
 
     VkAttachmentDescription attachment_description = { 0 };
@@ -127,8 +127,8 @@ void odin_vulkan_draw_prepare_window(odin_render_device render_device, odin_wind
 
 
     /* Create the framebuffers and image views. */
-    vulkan_window->image_views =            NEW(VkImageView, vulkan_window->image_count);
-    vulkan_window->image_framebuffers =     NEW(VkFramebuffer, vulkan_window->image_count);
+    vulkan_window->image_views =            AERO_NEW(VkImageView, vulkan_window->image_count);
+    vulkan_window->image_framebuffers =     AERO_NEW(VkFramebuffer, vulkan_window->image_count);
 
     for(int i = 0; i < vulkan_window->image_count; i++)
     {
@@ -216,7 +216,24 @@ void odin_vulkan_draw_frame_window(odin_render_device render_device, odin_window
         odin_vulkan_framebuffer present_framebuffer = malloc(sizeof(odin_vulkan_framebuffer));
         present_framebuffer->framebuffer = vulkan_window->image_framebuffers[image_index];
 
+        int width = 0, height = 0;
+        odin_platform_get_native_window_size(vulkan_window->native_window, &width, &height);
 
+        VkViewport viewport = { 0 };
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = (float)width;
+        viewport.height = (float)height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        vkCmdSetViewport(current_command_buffer, 0, 1, &viewport);
+
+        VkRect2D scissor = { 0 };
+        scissor.offset = (VkOffset2D){0, 0};
+        scissor.extent = (VkExtent2D){width, height};
+
+        vkCmdSetScissor(current_command_buffer, 0, 1, &scissor);
 
         draw_func(render_device, (odin_draw_data)vulkan_draw_data, (odin_render_pass)vulkan_window->present_pass, (odin_framebuffer)present_framebuffer, user_data);
 

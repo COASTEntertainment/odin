@@ -23,7 +23,7 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
 
 
     /* Get all the attachments in a vulkan pointer. */
-    VkImageView* vulkan_attachments = NEW(VkImageView, attachments_count);
+    VkImageView* vulkan_attachments = AERO_NEW(VkImageView, attachments_count);
 
     for(int i = 0; i < attachments_count; i++)
     {
@@ -49,7 +49,7 @@ void odin_vulkan_framebuffer_create(odin_render_device render_device, odin_frame
         ODIN_ERROR("o_vulkan_framebuffer.c", "Could not create a framebuffer!");
     }
 
-    DELETE(vulkan_attachments);
+    AERO_DELETE(vulkan_attachments);
 
 }
 
@@ -63,7 +63,7 @@ void odin_vulkan_framebuffer_destroy(odin_render_device render_device, odin_fram
     
     vkDestroyFramebuffer(vulkan_render_device->device, vulkan_framebuffer->framebuffer, NULL);
 
-    DELETE(framebuffer);
+    AERO_DELETE(framebuffer);
 
 }
 

@@ -10,6 +10,7 @@
 #include "odin/o_log.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_platform.h"
+#include "odin/o_platform_internal.h"
 
 
 /* The debug callback for vulkan. */
@@ -106,8 +107,7 @@ void odin_vulkan_initialize(odin_render_device *render_device, odin_render_devic
         ODIN_ERROR("o_vulkan_initialize.c", "Could not create the Vulkan instance.");
     }
 
-    /* Initialize the platform. */
-    odin_vulkan_platform_initialize(vulkan_render_device);
+    odin_platform_init();
 
 }
 
@@ -136,7 +136,7 @@ void odin_vulkan_terminate(odin_render_device render_device)
 
 
     /* Clear all render device memory. */
-    DELETE(vulkan_render_device);
+    AERO_DELETE(vulkan_render_device);
 }
 
 VkBool32 odin_vulkan_debug_utils_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)

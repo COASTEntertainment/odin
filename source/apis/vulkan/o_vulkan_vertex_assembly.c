@@ -96,6 +96,52 @@ void odin_vulkan_vertex_format_to_vulkan(odin_vertex_element_format element_form
     };
 }
 
+void odin_vulkan_vertex_format_size(VkFormat element_format, int32_t* element_size)
+{
+    
+    switch(element_format)
+    {
+    
+        case VK_FORMAT_R32_SFLOAT:
+            *element_size = sizeof(float);
+            break;
+
+        case VK_FORMAT_R32_SINT:
+            *element_size = sizeof(int32_t);
+            break;
+
+        case VK_FORMAT_R64_SINT:
+            *element_size = sizeof(int64_t);
+            break;
+
+        case VK_FORMAT_R32G32_SFLOAT:
+            *element_size = sizeof(float) * 2;
+            break;
+        
+        case VK_FORMAT_R32G32_SINT:
+            *element_size = sizeof(int32_t) * 2;
+
+            break;
+        case VK_FORMAT_R32G32B32_SFLOAT:
+            *element_size = sizeof(float) * 3;
+            break;
+
+        case VK_FORMAT_R32G32B32_SINT:
+            *element_size = sizeof(int32_t) * 3;
+            break;
+
+        case VK_FORMAT_R32G32B32A32_SFLOAT:
+            *element_size = sizeof(float) * 4;
+            break;
+        
+        case VK_FORMAT_R32G32B32A32_SINT:
+            *element_size = sizeof(int32_t) * 4;
+            break;
+        
+    };
+}
+
+
 
 /** \brief Adds an element to a vertex assembly for description. */
 void odin_vulkan_vertex_assembly_describe_element(odin_render_device render_device, odin_vertex_assembly vertex_assembly, int element_index, odin_vertex_element_format format)
@@ -117,9 +163,8 @@ void odin_vulkan_vertex_assembly_describe_element(odin_render_device render_devi
     if(element_index > 0)
     {
         uint32_t previous_element_size = 0;
-        VkFormat previous_element_format = 0;
 
-        odin_vulkan_vertex_format_to_vulkan(previous_element_size, &previous_element_size, &previous_element_format);
+        odin_vulkan_vertex_format_size(vulkan_vertex_assembly->attributes[element_index - 1].format, &previous_element_size);
     
         offset = vulkan_vertex_assembly->attributes[element_index - 1].offset + previous_element_size;
     }

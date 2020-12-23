@@ -9,11 +9,13 @@
 #include "odin/o_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_render_device.h"
 #include "odin/apis/vulkan/o_vulkan_render_pass.h"
+#include "odin/o_platform_internal.h"
 
 
-/** \brief A base vulkan abstraction for a window/drawing surface. */
-typedef struct odin_vulkan_window_t
+typedef struct odin_vulkan_window
 {
+
+    odin_native_window native_window;
 
     VkSurfaceKHR surface; /** \brief The drawing surface. */
     uint32_t image_count; /** \brief The amount of images when presenting. */
@@ -24,8 +26,7 @@ typedef struct odin_vulkan_window_t
     VkExtent2D surface_extent; /** \brief The size of the window. */
     VkPresentModeKHR present_mode; /** \brief How swapchain images should be presented to the screen. */
     VkSwapchainKHR swapchain; /** \brief The swapchain. */
-    
-    
+
     odin_vulkan_render_pass present_pass; /** \brief The render pass for */
     VkCommandBuffer* command_buffers; /** \brief Command buffer to send commands. */
     VkSemaphore* image_available_semaphores; /** \brief Semaphores to determine when an image is finished. */
@@ -36,16 +37,23 @@ typedef struct odin_vulkan_window_t
 } odin_vulkan_window_t, *odin_vulkan_window;
 
 
-void odin_vulkan_get_monitors(odin_render_device render_device, int *monitors_count, odin_monitor *monitors);
-
-void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, odin_input_device input_device, const char* title, int x, int y, int width, int height, odin_window_style style, bool fullscreen, odin_monitor monitor);
+void odin_vulkan_window_create(odin_render_device render_device, odin_window* window, odin_input_device input_device, const char* title, int x, int y, int width, int height, odin_window_style style);
 
 void odin_vulkan_window_destroy(odin_render_device render_device, odin_window window);
 
 void odin_vulkan_window_fullscreen(odin_render_device render_device, odin_window window, bool fullscreen);
 
-void odin_vulkan_window_get_input_device(odin_window window, odin_input_device* input_device);
+/** \brief Retreives the size of the window. */
+void odin_vulkan_window_get_size(
+    odin_window window,
+    int* width,
+    int* height);
 
+/** \brief Changes the size of the window. */
+void odin_vulkan_window_resize(
+    odin_window window, 
+    int width, 
+    int height);
 
 /** \brief Creates a swapchain for a window. */
 void odin_vulkan_window_swapchain_create(odin_vulkan_render_device render_device, odin_vulkan_window window);

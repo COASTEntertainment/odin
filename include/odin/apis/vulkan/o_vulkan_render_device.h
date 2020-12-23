@@ -9,7 +9,6 @@
 
 #include "odin/apis/vulkan/vk_mem_alloc.h"
 
-typedef struct odin_vulkan_window_t *odin_vulkan_window;
 
 typedef struct odin_vulkan_render_device_t
 {
@@ -27,8 +26,6 @@ typedef struct odin_vulkan_render_device_t
     VkCommandPool command_pool; /** \brief The command pool for allocating command buffers. */
 
     VmaAllocator memory_allocator; /** \brief The allocator of Graphics memory. */
-
-    odin_vulkan_window main_window;
 
 } odin_vulkan_render_device_t, *odin_vulkan_render_device;
 

@@ -11,7 +11,7 @@
 #include "aero/a_string.h"
 
 
-void window_processor(odin_window window, odin_event event, odin_event_window_data_t window_data);
+void window_processor(odin_window window, odin_event event, odin_event_window_data window_data);
 
 void cube_draw(odin_render_device render_device, odin_draw_data draw_data, odin_render_pass present_pass, odin_framebuffer framebuffer, void* user_data);
 
@@ -21,6 +21,7 @@ typedef struct default_vertex
 
     float position[2];
     float color[3];
+
 } default_vertex_t;
 
 
@@ -31,6 +32,7 @@ static default_vertex_t verts[4] =
     {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
     {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
     {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+
 };
 
 
@@ -48,6 +50,7 @@ typedef struct cube_example_data
     odin_vertex_buffer      vertex_buffer;
     odin_index_buffer       index_buffer;
     odin_pipeline           pipeline;
+
 } cube_example_data;
 
 cube_example_data cube_data = { 0 };
@@ -73,32 +76,16 @@ int main()
 
     odin_render_device_create(&cube_data.render_device, &initialize_info);
 
-    /* Get the monitors count. */
-    int monitors_count = 0;
-    odin_get_monitors(cube_data.render_device, &monitors_count, NULL);
-
-    /* Create the monitors array. */
-    odin_monitor* monitors = malloc(sizeof(odin_monitor) * monitors_count);
-    memset(monitors, 0, sizeof(odin_monitor) * monitors_count);
-
-    /* Get the monitors. */
-    odin_get_monitors(cube_data.render_device, &monitors_count, monitors);
-
-    int width = monitors[0]->width;
-    int height = monitors[0]->height;
-
     /* Create the window. */
     odin_window window = NULL;
     odin_window_create(
         cube_data.render_device, 
         &window, input_device, 
         "Cube Example", 
-        0, 0, monitors[0]->width / 2, monitors[0]->height / 2, 
-        odin_window_style_defalt, 
-        false, 
-        NULL);
+        0, 0, 800, 600, 
+        odin_window_style_defalt);
 
-    free(monitors);
+
 
                           
     /* Get the physical devices. */
@@ -110,7 +97,7 @@ int main()
 
     odin_get_physical_devices(cube_data.render_device, &physical_devices_count, physical_devices);
     odin_set_physical_device(cube_data.render_device, physical_devices[0], window);
-    
+
 
     /* Describe the vertex assembly to create vertex buffers. */
     odin_vertex_assembly vertex_assembly;
@@ -159,6 +146,7 @@ int main()
     odin_render_pass present_pass;
     odin_draw_prepare_window(cube_data.render_device, window, &present_pass);
 
+
     odin_pipeline_create(cube_data.render_device, &cube_data.pipeline, simple_shader_vert, simple_shader_frag, present_pass, 1, &vertex_assembly);
 
 
@@ -176,8 +164,6 @@ int main()
 
         /* Draw to the window. */
         odin_draw_frame_window(cube_data.render_device, window, cube_draw, &cube_data);
-
-
 
         
 
@@ -225,7 +211,7 @@ int main()
 }
 
 
-void window_processor(odin_window window, odin_event event, odin_event_window_data_t window_data)
+void window_processor(odin_window window, odin_event event, odin_event_window_data window_data)
 {
 
     

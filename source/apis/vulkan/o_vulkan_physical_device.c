@@ -61,9 +61,6 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
     /* Set the physical device. */
     vulkan_render_device->physical_device = (VkPhysicalDevice)physical_device;
 
-    /* Set the main window. */
-    vulkan_render_device->main_window = vulkan_window;
-
 
     /* Get physical device queues */
     uint32_t queue_family_count;
@@ -85,7 +82,7 @@ void odin_vulkan_set_physical_device(odin_render_device render_device, odin_phys
 
         /* Get Present Queue */
         VkBool32 presentSupport;
-        vkGetPhysicalDeviceSurfaceSupportKHR(vulkan_render_device->physical_device, i, vulkan_render_device->main_window->surface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(vulkan_render_device->physical_device, i, vulkan_window->surface, &presentSupport);
 
         if(presentSupport)
         {
